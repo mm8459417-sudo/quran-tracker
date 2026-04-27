@@ -12,10 +12,10 @@ const Login = ({ onLoginSuccess }) => {
   const videoRefs = useRef([]);
 
   // قائمة الفيديوهات الـ 3 التي تم رفعها على GitHub
- const videos = [
-    "/vid1.mp4.mp4",
-    "/vid2 .mp4.mp4",
-    "/vid3 .mp4.mp4"
+const videos = [
+    "/vid1.mp4",
+    "/vid2.mp4",
+    "/vid3.mp4"
   ];
 
   // دالة الانتقال للفيديو التالي
