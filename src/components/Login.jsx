@@ -15,7 +15,12 @@ const Login = ({ onLoginSuccess }) => {
   // 1. مصفوفة الـ Refs عشان نتحكم في الـ 4 فيديوهات مع بعض
   const videoRefs = useRef([]);
 
-  const videos = ["/vid1.mp4", "/vid2.mp4", "/vid3.mp4", "/vid4.mp4"];
+ // مصفوفة الفيديوهات بقت 3 بس
+  const videos = [
+    "/vid1.mp4",
+    "/vid2.mp4",
+    "/vid3.mp4"
+  ];
 
   // 2. دالة النقل للفيديو اللي بعده
   const handleVideoEnd = () => {
