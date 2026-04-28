@@ -1,18 +1,19 @@
-import { getFirestore } from "firebase/firestore";
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyDTQOvTrVteyFoxacYHxMNSmoCQBSF5pqc",
+  authDomain: "quran-tracking-for-tutor-387ce.firebaseapp.com",
+  projectId: "quran-tracking-for-tutor-387ce",
+  storageBucket: "quran-tracking-for-tutor-387ce.firebasestorage.app",
+  messagingSenderId: "1034262668810",
+  appId: "1:1034262668810:web:40f9065973f7e8bdfd21f3"
 };
 
-// هنا التعديل السحري: بنتأكد إن فايربيز مش شغال قبل ما نشغله
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// تهيئة المشروع
+const app = initializeApp(firebaseConfig);
 
+// تصدير خدمات فايربيز (تسجيل الدخول وقاعدة البيانات)
 export const auth = getAuth(app);
 export const db = getFirestore(app);
