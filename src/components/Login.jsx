@@ -83,9 +83,24 @@ const Login = ({ onLoginSuccess }) => {
       <div className="absolute z-10 inset-0 bg-black/60"></div>
 
       <div className="relative z-20 bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl w-full max-w-md mx-4">
-        <h2 className="text-3xl font-bold text-center text-green-800 mb-6">
-          {isSignUp ? "إنشاء حساب جديد" : "تسجيل الدخول"}
-        </h2>
+        
+        {/* --- بداية الهوية البصرية --- */}
+        <div className="flex flex-col items-center mb-6">
+          <img 
+            src="/logo.png" 
+            alt="شعار رفيق المعلم" 
+            className="h-24 w-auto object-contain mb-3 drop-shadow-md" 
+          />
+          <h1 className="text-2xl font-bold text-green-800">رفيق المعلم</h1>
+          <p className="text-sm font-bold mt-1" style={{ color: "#d97706" }}>
+            رفيق المعلم.. ودليل الأكاديمية
+          </p>
+        </div>
+        {/* --- نهاية الهوية البصرية --- */}
+
+        <h2 className="text-lg font-bold text-center text-gray-500 mb-5">
+          {isSignUp ? "إنشاء حساب جديد" : "تسجيل الدخول لحسابك"}
+        </h2>
 
         {/* اتجاه النص هنا من اليسار لليمين عشان لو ظهر إيرور بالإنجليزي يتقري صح */}
         {error && <p className="text-red-500 text-sm text-center mb-4 font-bold" dir="ltr">{error}</p>}
