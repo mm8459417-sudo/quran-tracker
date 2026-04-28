@@ -3170,25 +3170,61 @@ function DashboardContent({ user, onLogout }) {
         </div>
       )}
 
-      {/* ── HEADER MODIFIED WITH LOGOUT ── */}
+     {/* ── HEADER MODIFIED WITH LOGOUT ── */}
       <div
         style={{
           background: "var(--c-primary)",
-          padding: "14px 15px 11px",
+          padding: "12px 15px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
         }}
       >
-        <div style={{ textAlign: "right" }}>
-          <div
+        {/* --- بداية اللوجو والبراندينج يمين --- */}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <img 
+            src="/logo.png" 
+            alt="شعار رفيق المعلم" 
+            style={{ height: "55px", width: "auto", objectFit: "contain", filter: "drop-shadow(0px 2px 4px rgba(0,0,0,0.2))" }} 
+          />
+          <div style={{ textAlign: "right", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+            <div style={{ fontSize: "20px", fontWeight: "800", color: "#ffffff", letterSpacing: "0.5px" }}>
+              رفيق المعلم
+            </div>
+            <div style={{ fontSize: "11px", color: "#fcd34d", marginTop: "3px", fontWeight: "700" }}>
+              رفيق المعلم.. ودليل الأكاديمية
+            </div>
+          </div>
+        </div>
+        {/* --- نهاية اللوجو --- */}
+
+        {/* --- جزء بيانات المعلم والخروج يسار --- */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "6px" }}>
+          <div style={{ fontSize: "11px", color: "var(--c-primary-mid)", fontWeight: "600" }}>
+            👤 المعلم: {TEACHER}
+          </div>
+          <button
+            onClick={onLogout}
             style={{
-              fontSize: 20,
-              fontWeight: 700,
-              fontFamily: "var(--font-quran)",
+              background: "rgba(255, 255, 255, 0.15)",
               color: "#fff",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              padding: "5px 12px",
+              borderRadius: "8px",
+              fontSize: "12px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              transition: "all 0.2s"
             }}
+            onMouseEnter={(e) => e.target.style.background = "rgba(220, 38, 38, 0.8)"}
+            onMouseLeave={(e) => e.target.style.background = "rgba(255, 255, 255, 0.15)"}
           >
+            تسجيل خروج
+          </button>
+        </div>
+      </div>
             حلقة القرآن الكريم
           </div>
           <div
