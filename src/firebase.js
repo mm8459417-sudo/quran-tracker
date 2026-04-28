@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -11,9 +11,9 @@ const firebaseConfig = {
   appId: "1:1034262668810:web:40f9065973f7e8bdfd21f3"
 };
 
-// تهيئة المشروع
 const app = initializeApp(firebaseConfig);
-
-// تصدير خدمات فايربيز (تسجيل الدخول وقاعدة البيانات)
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// السطر ده هو اللي بيجبر المتصفح يحفظ تسجيل الدخول
+setPersistence(auth, browserLocalPersistence).catch(console.error);
