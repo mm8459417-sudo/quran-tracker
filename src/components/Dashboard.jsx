@@ -16,6 +16,7 @@ import {
 } from "recharts";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import logo from "./logo.png"; 
 
 // ════════════════════════════════════════════════════════════════════════════════
 // Error Boundary
@@ -43,40 +44,11 @@ class ErrorBoundary extends React.Component {
           }}
         >
           <div style={{ fontSize: 52, marginBottom: 12 }}>⚠️</div>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              color: "#dc2626",
-              marginBottom: 8,
-            }}
-          >
-            حدث خطأ غير متوقع
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              color: "#6b7280",
-              marginBottom: 4,
-              maxWidth: 300,
-              margin: "0 auto 20px",
-            }}
-          >
+          <div style={{ fontSize: 18, fontWeight: 700, color: "#dc2626", marginBottom: 8 }}>حدث خطأ غير متوقع</div>
+          <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 4, maxWidth: 300, margin: "0 auto 20px" }}>
             {this.state.error?.message || "خطأ غير معروف"}
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              background: "#065f46",
-              color: "#fff",
-              border: "none",
-              padding: "10px 24px",
-              borderRadius: 10,
-              fontSize: 14,
-              cursor: "pointer",
-              fontFamily: "inherit",
-            }}
-          >
+          <button onClick={() => window.location.reload()} style={{ background: "#065f46", color: "#fff", border: "none", padding: "10px 24px", borderRadius: 10, fontSize: 14, cursor: "pointer", fontFamily: "inherit" }}>
             🔄 إعادة تحميل التطبيق
           </button>
         </div>
@@ -90,8 +62,7 @@ class ErrorBoundary extends React.Component {
 async function dbGet(k) {
   try {
     const localRaw = localStorage.getItem(k);
-    let localValue = null,
-      localTs = 0;
+    let localValue = null, localTs = 0;
     if (localRaw) {
       try {
         const parsed = JSON.parse(localRaw);
@@ -106,23 +77,15 @@ async function dbGet(k) {
     try {
       const docSnap = await getDoc(doc(db, "appData", k));
       if (docSnap.exists()) {
-        const data = docSnap.data(),
-          cloudTs = data.updatedAt || 0;
+        const data = docSnap.data(), cloudTs = data.updatedAt || 0;
         if (cloudTs >= localTs) {
-          localStorage.setItem(
-            k,
-            JSON.stringify({ _v: data.value, _ts: cloudTs })
-          );
+          localStorage.setItem(k, JSON.stringify({ _v: data.value, _ts: cloudTs }));
           return data.value;
         }
       }
-    } catch (fbError) {
-      console.warn("تنبيه فايربيز (جلب):", fbError);
-    }
+    } catch (fbError) { console.warn("تنبيه فايربيز (جلب):", fbError); }
     return localValue;
-  } catch {
-    return null;
-  }
+  } catch { return null; }
 }
 
 async function dbSet(k, v) {
@@ -131,12 +94,8 @@ async function dbSet(k, v) {
     localStorage.setItem(k, JSON.stringify({ _v: v, _ts: ts }));
     try {
       await setDoc(doc(db, "appData", k), { value: v, updatedAt: ts });
-    } catch (fbError) {
-      console.warn("تنبيه فايربيز (حفظ):", fbError);
-    }
-  } catch (e) {
-    console.error(e);
-  }
+    } catch (fbError) { console.warn("تنبيه فايربيز (حفظ):", fbError); }
+  } catch (e) { console.error(e); }
 }
 
 // ── Lazy loaders ──────────────────────────────────────────────────────────────
@@ -146,29 +105,16 @@ function loadHtmlToImage() {
     if (_htmlToImageState === "ready") return resolve();
     if (_htmlToImageState === "loading") {
       const iv = setInterval(() => {
-        if (_htmlToImageState === "ready") {
-          clearInterval(iv);
-          resolve();
-        }
-        if (_htmlToImageState === "idle") {
-          clearInterval(iv);
-          reject(new Error("فشل التحميل"));
-        }
+        if (_htmlToImageState === "ready") { clearInterval(iv); resolve(); }
+        if (_htmlToImageState === "idle") { clearInterval(iv); reject(new Error("فشل التحميل")); }
       }, 50);
       return;
     }
     _htmlToImageState = "loading";
     const s = document.createElement("script");
-    s.src =
-      "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js";
-    s.onload = () => {
-      _htmlToImageState = "ready";
-      resolve();
-    };
-    s.onerror = () => {
-      _htmlToImageState = "idle";
-      reject(new Error("فشل تحميل html-to-image"));
-    };
+    s.src = "https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js";
+    s.onload = () => { _htmlToImageState = "ready"; resolve(); };
+    s.onerror = () => { _htmlToImageState = "idle"; reject(new Error("فشل تحميل html-to-image")); };
     document.head.appendChild(s);
   });
 }
@@ -179,48 +125,28 @@ function loadJsPdf() {
     if (_jsPdfState === "ready") return resolve();
     if (_jsPdfState === "loading") {
       const iv = setInterval(() => {
-        if (_jsPdfState === "ready") {
-          clearInterval(iv);
-          resolve();
-        }
-        if (_jsPdfState === "idle") {
-          clearInterval(iv);
-          reject(new Error("فشل التحميل"));
-        }
+        if (_jsPdfState === "ready") { clearInterval(iv); resolve(); }
+        if (_jsPdfState === "idle") { clearInterval(iv); reject(new Error("فشل التحميل")); }
       }, 50);
       return;
     }
     _jsPdfState = "loading";
     const s = document.createElement("script");
-    s.src =
-      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-    s.onload = () => {
-      _jsPdfState = "ready";
-      resolve();
-    };
-    s.onerror = () => {
-      _jsPdfState = "idle";
-      reject(new Error("فشل تحميل jsPDF"));
-    };
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+    s.onload = () => { _jsPdfState = "ready"; resolve(); };
+    s.onerror = () => { _jsPdfState = "idle"; reject(new Error("فشل تحميل jsPDF")); };
     document.head.appendChild(s);
   });
 }
 
-let _gifState = "idle",
-  _gifWorkerUrl = null;
+let _gifState = "idle", _gifWorkerUrl = null;
 async function loadGifJs() {
   if (_gifState === "ready") return _gifWorkerUrl;
   if (_gifState === "loading") {
     await new Promise((resolve, reject) => {
       const iv = setInterval(() => {
-        if (_gifState === "ready") {
-          clearInterval(iv);
-          resolve();
-        }
-        if (_gifState === "idle") {
-          clearInterval(iv);
-          reject(new Error("فشل التحميل"));
-        }
+        if (_gifState === "ready") { clearInterval(iv); resolve(); }
+        if (_gifState === "idle") { clearInterval(iv); reject(new Error("فشل التحميل")); }
       }, 50);
     });
     return _gifWorkerUrl;
@@ -231,35 +157,26 @@ async function loadGifJs() {
       await new Promise((resolve, reject) => {
         const s = document.createElement("script");
         s.src = "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js";
-        s.onload = resolve;
-        s.onerror = () => reject(new Error("فشل تحميل gif.js"));
+        s.onload = resolve; s.onerror = () => reject(new Error("فشل تحميل gif.js"));
         document.head.appendChild(s);
       });
     }
     if (!_gifWorkerUrl) {
-      const res = await fetch(
-        "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js"
-      );
+      const res = await fetch("https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js");
       if (!res.ok) throw new Error("فشل تحميل gif.worker.js");
-      _gifWorkerUrl = URL.createObjectURL(
-        new Blob([await res.text()], { type: "text/javascript" })
-      );
+      _gifWorkerUrl = URL.createObjectURL(new Blob([await res.text()], { type: "text/javascript" }));
     }
-    _gifState = "ready";
-    return _gifWorkerUrl;
-  } catch (e) {
-    _gifState = "idle";
-    throw e;
-  }
+    _gifState = "ready"; return _gifWorkerUrl;
+  } catch (e) { _gifState = "idle"; throw e; }
 }
 
-// ── Improved image capture helper ─────────────────────────────────────────────
-async function captureElement(el, pixelRatio = 2) {
+// ── Improved image capture helper (FIXED FOR QUALITY AND LAYOUT) ─────────────
+async function captureElement(el, pixelRatio = 3) {
   await loadHtmlToImage();
   await document.fonts.ready;
-  await new Promise((r) =>
-    requestAnimationFrame(() => requestAnimationFrame(r))
-  );
+  
+  // تأخير إضافي لضمان تحميل الخطوط والصور 100% قبل أخذ اللقطة
+  await new Promise((r) => setTimeout(r, 600));
 
   const opts = {
     backgroundColor: "#ffffff",
@@ -268,6 +185,10 @@ async function captureElement(el, pixelRatio = 2) {
     useCORS: true,
     allowTaint: false,
     cacheBust: true,
+    style: {
+      transform: "scale(1)",
+      transformOrigin: "top left"
+    }
   };
 
   let dataUrl;
@@ -277,7 +198,7 @@ async function captureElement(el, pixelRatio = 2) {
       if (dataUrl && dataUrl.length > 1000) break;
     } catch (e) {
       if (attempt === 2) throw e;
-      await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 300));
     }
   }
   return dataUrl;
@@ -286,21 +207,9 @@ async function captureElement(el, pixelRatio = 2) {
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function freezeAnimations(el) {
   const nodes = [el, ...el.querySelectorAll("*")];
-  const saved = nodes.map((n) => ({
-    animation: n.style.animation,
-    transition: n.style.transition,
-    animationPlayState: n.style.animationPlayState,
-  }));
-  nodes.forEach((n) => {
-    n.style.animationPlayState = "paused";
-    n.style.transition = "none";
-  });
-  return () =>
-    nodes.forEach((n, i) => {
-      n.style.animation = saved[i].animation;
-      n.style.transition = saved[i].transition;
-      n.style.animationPlayState = saved[i].animationPlayState;
-    });
+  const saved = nodes.map((n) => ({ animation: n.style.animation, transition: n.style.transition, animationPlayState: n.style.animationPlayState }));
+  nodes.forEach((n) => { n.style.animationPlayState = "paused"; n.style.transition = "none"; });
+  return () => nodes.forEach((n, i) => { n.style.animation = saved[i].animation; n.style.transition = saved[i].transition; n.style.animationPlayState = saved[i].animationPlayState; });
 }
 
 function dataUrlToCanvas(dataUrl, w, h) {
@@ -308,8 +217,7 @@ function dataUrlToCanvas(dataUrl, w, h) {
     const img = new Image();
     img.onload = () => {
       const c = document.createElement("canvas");
-      c.width = w;
-      c.height = h;
+      c.width = w; c.height = h;
       c.getContext("2d").drawImage(img, 0, 0, w, h);
       resolve(c);
     };
@@ -323,509 +231,144 @@ function Stars({ value, onChange }) {
     <div style={{ display: "flex", gap: 6, direction: "ltr" }}>
       {[1, 2, 3, 4, 5].map((i) => (
         <span
-          key={i}
-          onMouseEnter={() => setHov(i)}
-          onMouseLeave={() => setHov(0)}
-          onClick={() => onChange(i === value ? 0 : i)}
-          tabIndex={0}
-          role="button"
-          aria-label={`${i} نجوم`}
-          onKeyDown={(e) =>
-            (e.key === "Enter" || e.key === " ") &&
-            onChange(i === value ? 0 : i)
-          }
-          style={{
-            fontSize: 22,
-            cursor: "pointer",
-            transition: "transform .15s, filter .15s",
-            transform: (hov || value) >= i ? "scale(1.25)" : "scale(1)",
-            filter: (hov || value) >= i ? "none" : "grayscale(1) opacity(.35)",
-            userSelect: "none",
-          }}
-        >
-          ⭐
-        </span>
+          key={i} onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(0)} onClick={() => onChange(i === value ? 0 : i)} tabIndex={0} role="button"
+          style={{ fontSize: 22, cursor: "pointer", transition: "transform .15s", transform: (hov || value) >= i ? "scale(1.25)" : "scale(1)", filter: (hov || value) >= i ? "none" : "grayscale(1) opacity(.35)", userSelect: "none" }}
+        >⭐</span>
       ))}
     </div>
   );
 }
 
 function getArDate(iso) {
-  try {
-    return new Date(iso).toLocaleDateString("ar-EG", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  } catch {
-    return iso;
-  }
+  try { return new Date(iso).toLocaleDateString("ar-EG", { weekday: "long", year: "numeric", month: "long", day: "numeric" }); }
+  catch { return iso; }
 }
 
 function getMonthLabel(year, month) {
-  try {
-    return new Date(year, month - 1, 1).toLocaleDateString("ar-EG", {
-      year: "numeric",
-      month: "long",
-    });
-  } catch {
-    return `${year}/${month}`;
-  }
+  try { return new Date(year, month - 1, 1).toLocaleDateString("ar-EG", { year: "numeric", month: "long" }); }
+  catch { return `${year}/${month}`; }
 }
 
 function formatTime12h(time24) {
   if (!time24 || typeof time24 !== "string") return "";
   const parts = time24.split(":");
   if (parts.length < 2) return time24;
-  const h = parseInt(parts[0], 10);
-  const m = parseInt(parts[1], 10);
+  const h = parseInt(parts[0], 10), m = parseInt(parts[1], 10);
   if (isNaN(h) || isNaN(m)) return time24;
-  const suffix = h >= 12 ? "م" : "ص";
-  const h12 = h % 12 || 12;
+  const suffix = h >= 12 ? "م" : "ص", h12 = h % 12 || 12;
   return `${h12}:${String(m).padStart(2, "0")} ${suffix}`;
 }
 
-const TAJWEED = [
-  "الإدغام",
-  "الإخفاء",
-  "الإقلاب",
-  "الغنة",
-  "المدود",
-  "الوقف والابتداء",
-  "أخرى",
-];
+const TAJWEED = ["الإدغام", "الإخفاء", "الإقلاب", "الغنة", "المدود", "الوقف والابتداء", "أخرى"];
 const RATINGS = [
-  {
-    v: 4,
-    label: "ممتاز ✨",
-    color: "var(--c-primary)",
-    bg: "var(--c-primary-light)",
-  },
-  {
-    v: 3,
-    label: "جيد جداً 👍",
-    color: "var(--c-blue)",
-    bg: "var(--c-blue-light)",
-  },
-  {
-    v: 2,
-    label: "جيد 🙂",
-    color: "var(--c-amber)",
-    bg: "var(--c-amber-light)",
-  },
-  {
-    v: 1,
-    label: "يحتاج مراجعة 📚",
-    color: "var(--color-text-secondary)",
-    bg: "var(--color-background-tertiary)",
-  },
+  { v: 4, label: "ممتاز ✨", color: "var(--c-primary)", bg: "var(--c-primary-light)" },
+  { v: 3, label: "جيد جداً 👍", color: "var(--c-blue)", bg: "var(--c-blue-light)" },
+  { v: 2, label: "جيد 🙂", color: "var(--c-amber)", bg: "var(--c-amber-light)" },
+  { v: 1, label: "يحتاج مراجعة 📚", color: "var(--color-text-secondary)", bg: "var(--color-background-tertiary)" },
 ];
 const HIST_PAGE_SIZE = 20;
 const PAGE_SIZE_PDF = 10;
 
-// ════════════════════════════════════════════════════════════════════════════════
-// Islamic Education Categories
-// ════════════════════════════════════════════════════════════════════════════════
 const ISLAMIC_CATEGORIES = [
-  {
-    id: "asma",
-    label: "أسماء حسنى",
-    icon: "✨",
-    fields: [
-      { key: "name", label: "الاسم", placeholder: "مثال: الرحمن" },
-      { key: "notes", label: "ملاحظات التدبر", placeholder: "ما تم تدبره..." },
-    ],
-  },
-  {
-    id: "hadith",
-    label: "حديث",
-    icon: "📜",
-    fields: [
-      { key: "text", label: "نص الحديث", placeholder: "نص الحديث الشريف..." },
-      { key: "notes", label: "ملاحظات", placeholder: "الشرح والتطبيق..." },
-    ],
-  },
-  {
-    id: "prophet",
-    label: "قصص الأنبياء",
-    icon: "🌟",
-    fields: [
-      {
-        key: "prophet",
-        label: "اسم النبي",
-        placeholder: "مثال: نوح عليه السلام",
-      },
-      { key: "notes", label: "الدروس والعبر", placeholder: "ما استفدناه..." },
-    ],
-  },
-  {
-    id: "story",
-    label: "قصة وعبرة",
-    icon: "📖",
-    fields: [
-      { key: "title", label: "اسم القصة", placeholder: "عنوان القصة..." },
-      { key: "lesson", label: "العبرة", placeholder: "العبرة المستفادة..." },
-    ],
-  },
-  {
-    id: "sahabi",
-    label: "صحابي/صحابية",
-    icon: "🏅",
-    fields: [
-      {
-        key: "name",
-        label: "اسم الصحابي",
-        placeholder: "مثال: أبو بكر الصديق",
-      },
-      { key: "notes", label: "أبرز الصفات", placeholder: "صفاته ومناقبه..." },
-    ],
-  },
+  { id: "asma", label: "أسماء حسنى", icon: "✨", fields: [{ key: "name", label: "الاسم", placeholder: "مثال: الرحمن" }, { key: "notes", label: "ملاحظات التدبر", placeholder: "ما تم تدبره..." }] },
+  { id: "hadith", label: "حديث", icon: "📜", fields: [{ key: "text", label: "نص الحديث", placeholder: "نص الحديث الشريف..." }, { key: "notes", label: "ملاحظات", placeholder: "الشرح والتطبيق..." }] },
+  { id: "prophet", label: "قصص الأنبياء", icon: "🌟", fields: [{ key: "prophet", label: "اسم النبي", placeholder: "مثال: نوح عليه السلام" }, { key: "notes", label: "الدروس والعبر", placeholder: "ما استفدناه..." }] },
+  { id: "story", label: "قصة وعبرة", icon: "📖", fields: [{ key: "title", label: "اسم القصة", placeholder: "عنوان القصة..." }, { key: "lesson", label: "العبرة", placeholder: "العبرة المستفادة..." }] },
+  { id: "sahabi", label: "صحابي/صحابية", icon: "🏅", fields: [{ key: "name", label: "اسم الصحابي", placeholder: "مثال: أبو بكر الصديق" }, { key: "notes", label: "أبرز الصفات", placeholder: "صفاته ومناقبه..." }] },
 ];
 
-// ════════════════════════════════════════════════════════════════════════════════
-// Schedule helpers
-// ════════════════════════════════════════════════════════════════════════════════
-const ARABIC_DAYS = [
-  "الأحد",
-  "الاثنين",
-  "الثلاثاء",
-  "الأربعاء",
-  "الخميس",
-  "الجمعة",
-  "السبت",
-];
+const ARABIC_DAYS = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
 
 function suggestedSlots(limit) {
   const n = parseInt(limit) || 12;
-  if (n <= 4) return 1;
-  if (n <= 8) return 2;
-  if (n <= 12) return 3;
-  if (n <= 16) return 4;
-  return 5;
+  if (n <= 4) return 1; if (n <= 8) return 2; if (n <= 12) return 3; if (n <= 16) return 4; return 5;
 }
 
 const DEFAULT_DAY_SETS = {
-  1: ["السبت"],
-  2: ["السبت", "الثلاثاء"],
-  3: ["السبت", "الاثنين", "الأربعاء"],
-  4: ["السبت", "الاثنين", "الأربعاء", "الخميس"],
-  5: ["السبت", "الأحد", "الاثنين", "الأربعاء", "الخميس"],
+  1: ["السبت"], 2: ["السبت", "الثلاثاء"], 3: ["السبت", "الاثنين", "الأربعاء"], 4: ["السبت", "الاثنين", "الأربعاء", "الخميس"], 5: ["السبت", "الأحد", "الاثنين", "الأربعاء", "الخميس"],
 };
 
 function defaultSchedule(limit) {
   const count = suggestedSlots(limit);
-  return (DEFAULT_DAY_SETS[count] || DEFAULT_DAY_SETS[3]).map((day) => ({
-    id: Date.now() + Math.random(),
-    day,
-    time: "17:00",
-  }));
+  return (DEFAULT_DAY_SETS[count] || DEFAULT_DAY_SETS[3]).map((day) => ({ id: Date.now() + Math.random(), day, time: "17:00" }));
 }
 
 function ScheduleEditor({ schedule, onChange, sessionLimit }) {
   const suggested = suggestedSlots(sessionLimit);
-
   function addSlot() {
     const usedDays = schedule.map((s) => s.day);
     const freeDay = ARABIC_DAYS.find((d) => !usedDays.includes(d)) || "السبت";
-    onChange([
-      ...schedule,
-      { id: Date.now() + Math.random(), day: freeDay, time: "17:00" },
-    ]);
+    onChange([...schedule, { id: Date.now() + Math.random(), day: freeDay, time: "17:00" }]);
   }
-
-  function removeSlot(id) {
-    onChange(schedule.filter((s) => s.id !== id));
-  }
-  function updateSlot(id, field, value) {
-    onChange(schedule.map((s) => (s.id === id ? { ...s, [field]: value } : s)));
-  }
-
-  const I_SM = {
-    border: "0.5px solid var(--color-border-secondary)",
-    borderRadius: 8,
-    padding: "7px 10px",
-    fontSize: 13,
-    fontFamily: "inherit",
-    background: "var(--color-background-primary)",
-    color: "var(--color-text-primary)",
-    outline: "none",
-    cursor: "pointer",
-  };
+  function removeSlot(id) { onChange(schedule.filter((s) => s.id !== id)); }
+  function updateSlot(id, field, value) { onChange(schedule.map((s) => (s.id === id ? { ...s, [field]: value } : s))); }
+  const I_SM = { border: "0.5px solid var(--color-border-secondary)", borderRadius: 8, padding: "7px 10px", fontSize: 13, fontFamily: "inherit", background: "var(--color-background-primary)", color: "var(--color-text-primary)", outline: "none", cursor: "pointer" };
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 8,
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 16 }}>🗓️</span>
-          <span
-            style={{ fontSize: 13, fontWeight: 500, color: "var(--c-primary)" }}
-          >
-            مواعيد الحلقة الأسبوعية
-          </span>
-        </div>
-        <div
-          style={{
-            fontSize: 11,
-            color: "var(--color-text-tertiary)",
-            background: "var(--color-background-tertiary)",
-            padding: "3px 8px",
-            borderRadius: 20,
-          }}
-        >
-          مقترح: {suggested} {suggested === 1 ? "موعد" : "مواعيد"}
-        </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 16 }}>🗓️</span><span style={{ fontSize: 13, fontWeight: 500, color: "var(--c-primary)" }}>مواعيد الحلقة الأسبوعية</span></div>
+        <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", background: "var(--color-background-tertiary)", padding: "3px 8px", borderRadius: 20 }}>مقترح: {suggested} {suggested === 1 ? "موعد" : "مواعيد"}</div>
       </div>
-
-      {schedule.length === 0 && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "12px 0",
-            fontSize: 12,
-            color: "var(--color-text-tertiary)",
-            background: "var(--color-background-secondary)",
-            borderRadius: 8,
-            marginBottom: 8,
-          }}
-        >
-          لا توجد مواعيد — اضغط "إضافة موعد" أدناه
-        </div>
-      )}
-
+      {schedule.length === 0 && <div style={{ textAlign: "center", padding: "12px 0", fontSize: 12, color: "var(--color-text-tertiary)", background: "var(--color-background-secondary)", borderRadius: 8, marginBottom: 8 }}>لا توجد مواعيد — اضغط "إضافة موعد" أدناه</div>}
       {schedule.map((slot, idx) => (
-        <div
-          key={slot.id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 7,
-            marginBottom: 7,
-            background: "var(--color-background-secondary)",
-            borderRadius: 10,
-            padding: "8px 10px",
-            border: "0.5px solid var(--color-border-tertiary)",
-            animation: "fadeUp .2s ease",
-          }}
-        >
-          <span
-            style={{
-              fontSize: 12,
-              color: "var(--color-text-tertiary)",
-              minWidth: 18,
-              textAlign: "center",
-            }}
-          >
-            {idx + 1}
-          </span>
-          <select
-            value={slot.day}
-            onChange={(e) => updateSlot(slot.id, "day", e.target.value)}
-            style={{ ...I_SM, flex: 1, direction: "rtl" }}
-          >
-            {ARABIC_DAYS.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
+        <div key={slot.id} style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 7, background: "var(--color-background-secondary)", borderRadius: 10, padding: "8px 10px", border: "0.5px solid var(--color-border-tertiary)", animation: "fadeUp .2s ease" }}>
+          <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", minWidth: 18, textAlign: "center" }}>{idx + 1}</span>
+          <select value={slot.day} onChange={(e) => updateSlot(slot.id, "day", e.target.value)} style={{ ...I_SM, flex: 1, direction: "rtl" }}>
+            {ARABIC_DAYS.map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
-          <input
-            type="time"
-            value={slot.time}
-            onChange={(e) => updateSlot(slot.id, "time", e.target.value)}
-            style={{ ...I_SM, direction: "ltr", minWidth: 88 }}
-          />
-          <button
-            onClick={() => removeSlot(slot.id)}
-            aria-label="حذف الموعد"
-            style={{
-              background: "var(--c-red-light)",
-              color: "var(--c-red)",
-              border: "none",
-              borderRadius: 8,
-              width: 30,
-              height: 30,
-              fontSize: 14,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            ×
-          </button>
+          <input type="time" value={slot.time} onChange={(e) => updateSlot(slot.id, "time", e.target.value)} style={{ ...I_SM, direction: "ltr", minWidth: 88 }} />
+          <button onClick={() => removeSlot(slot.id)} style={{ background: "var(--c-red-light)", color: "var(--c-red)", border: "none", borderRadius: 8, width: 30, height: 30, fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>×</button>
         </div>
       ))}
-
-      <button
-        onClick={addSlot}
-        style={{
-          width: "100%",
-          background: "var(--c-primary-bg)",
-          color: "var(--c-primary)",
-          border: "1px dashed var(--c-primary-border)",
-          borderRadius: 10,
-          padding: "8px",
-          fontSize: 12,
-          fontWeight: 500,
-          cursor: "pointer",
-          fontFamily: "inherit",
-          transition: "all .15s",
-        }}
-      >
-        ➕ إضافة موعد
-      </button>
-
+      <button onClick={addSlot} style={{ width: "100%", background: "var(--c-primary-bg)", color: "var(--c-primary)", border: "1px dashed var(--c-primary-border)", borderRadius: 10, padding: "8px", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "inherit", transition: "all .15s" }}>➕ إضافة موعد</button>
       {schedule.length > 0 && schedule.length !== suggested && (
-        <div
-          style={{
-            marginTop: 7,
-            fontSize: 11,
-            color: "var(--c-amber)",
-            background: "var(--c-amber-light)",
-            borderRadius: 8,
-            padding: "5px 10px",
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-          }}
-        >
-          💡 بناءً على باقة {sessionLimit} حصة، المقترح {suggested}{" "}
-          {suggested === 1 ? "موعد" : "مواعيد"} أسبوعياً — أنت اخترت{" "}
-          {schedule.length}
+        <div style={{ marginTop: 7, fontSize: 11, color: "var(--c-amber)", background: "var(--c-amber-light)", borderRadius: 8, padding: "5px 10px", display: "flex", alignItems: "center", gap: 5 }}>
+          💡 بناءً على باقة {sessionLimit} حصة، المقترح {suggested} {suggested === 1 ? "موعد" : "مواعيد"} أسبوعياً — أنت اخترت {schedule.length}
         </div>
       )}
     </div>
   );
 }
 
-// ════════════════════════════════════════════════════════════════════════════════
-// Islamic Education Form Component
-// ════════════════════════════════════════════════════════════════════════════════
 function IslamicCategoryBlock({ catId, data, onChange, onRemove }) {
   const cat = ISLAMIC_CATEGORIES.find((c) => c.id === catId);
   if (!cat) return null;
-
-  const I = {
-    width: "100%",
-    border: "0.5px solid var(--color-border-secondary)",
-    borderRadius: 10,
-    padding: "9px 12px",
-    fontSize: 13,
-    fontFamily: "inherit",
-    direction: "rtl",
-    outline: "none",
-    background: "var(--color-background-secondary)",
-    color: "var(--color-text-primary)",
-    boxSizing: "border-box",
-    marginBottom: 8,
-  };
+  const I = { width: "100%", border: "0.5px solid var(--color-border-secondary)", borderRadius: 10, padding: "9px 12px", fontSize: 13, fontFamily: "inherit", direction: "rtl", outline: "none", background: "var(--color-background-secondary)", color: "var(--color-text-primary)", boxSizing: "border-box", marginBottom: 8 };
 
   return (
-    <div
-      style={{
-        background: "var(--color-background-secondary)",
-        borderRadius: 12,
-        padding: "12px",
-        marginBottom: 10,
-        border: "0.5px solid var(--color-border-secondary)",
-        animation: "fadeUp .2s ease",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 10,
-        }}
-      >
-        <div
-          style={{ fontSize: 13, fontWeight: 700, color: "var(--c-primary)" }}
-        >
-          {cat.icon} {cat.label}
-        </div>
-        <button
-          onClick={onRemove}
-          style={{
-            background: "var(--c-red-light)",
-            color: "var(--c-red)",
-            border: "none",
-            borderRadius: 8,
-            width: 28,
-            height: 28,
-            fontSize: 14,
-            cursor: "pointer",
-          }}
-        >
-          ×
-        </button>
+    <div style={{ background: "var(--color-background-secondary)", borderRadius: 12, padding: "12px", marginBottom: 10, border: "0.5px solid var(--color-border-secondary)", animation: "fadeUp .2s ease" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--c-primary)" }}>{cat.icon} {cat.label}</div>
+        <button onClick={onRemove} style={{ background: "var(--c-red-light)", color: "var(--c-red)", border: "none", borderRadius: 8, width: 28, height: 28, fontSize: 14, cursor: "pointer" }}>×</button>
       </div>
       {cat.fields.map((field) => (
         <div key={field.key}>
-          <div
-            style={{
-              fontSize: 11,
-              color: "var(--color-text-tertiary)",
-              marginBottom: 3,
-            }}
-          >
-            {field.label}:
-          </div>
-          <textarea
-            value={data[field.key] || ""}
-            onChange={(e) => onChange({ ...data, [field.key]: e.target.value })}
-            placeholder={field.placeholder}
-            style={{ ...I, height: 55, resize: "none", marginBottom: 8 }}
-          />
+          <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginBottom: 3 }}>{field.label}:</div>
+          <textarea value={data[field.key] || ""} onChange={(e) => onChange({ ...data, [field.key]: e.target.value })} placeholder={field.placeholder} style={{ ...I, height: 55, resize: "none", marginBottom: 8 }} />
         </div>
       ))}
     </div>
   );
 }
 
-// ════════════════════════════════════════════════════════════════════════════════
-// Weekly Schedule View
-// ════════════════════════════════════════════════════════════════════════════════
 function WeeklyScheduleView({ students }) {
   const weekRef = useRef(null);
-
   const daySlots = useMemo(() => {
     const map = {};
     for (const day of ARABIC_DAYS) map[day] = [];
     for (const stu of students) {
       for (const sl of stu.schedule || []) {
-        if (map[sl.day]) {
-          map[sl.day].push({
-            id: sl.id,
-            time: sl.time || "00:00",
-            studentName: stu.name,
-            gender: stu.gender || "boy",
-            sessionLimit: stu.sessionLimit || 12,
-          });
-        }
+        if (map[sl.day]) map[sl.day].push({ id: sl.id, time: sl.time || "00:00", studentName: stu.name, gender: stu.gender || "boy", sessionLimit: stu.sessionLimit || 12 });
       }
     }
-    for (const day of ARABIC_DAYS) {
-      map[day].sort((a, b) => a.time.localeCompare(b.time));
-    }
+    for (const day of ARABIC_DAYS) map[day].sort((a, b) => a.time.localeCompare(b.time));
     return map;
   }, [students]);
 
   const activeDays = ARABIC_DAYS.filter((d) => daySlots[d].length > 0);
   const totalSlots = activeDays.reduce((sum, d) => sum + daySlots[d].length, 0);
-  const maxSlotsInDay = Math.max(
-    ...activeDays.map((d) => daySlots[d].length),
-    0
-  );
+  const maxSlotsInDay = Math.max(...activeDays.map((d) => daySlots[d].length), 0);
 
   async function saveWeeklyImage() {
     if (!weekRef.current) return;
@@ -837,280 +380,85 @@ function WeeklyScheduleView({ students }) {
       a.href = dataUrl;
       a.download = `الجدول_الأسبوعي.png`;
       a.click();
-    } catch (e) {
-      console.error("خطأ في حفظ الجدول:", e);
-    }
+    } catch (e) { console.error("خطأ في حفظ الجدول:", e); }
   }
 
   async function copyWeeklyAsText() {
     const lines = ["📅 الجدول الأسبوعي للحلقات", "─────────────────────────"];
     for (const day of activeDays) {
       lines.push(`\n${day}:`);
-      daySlots[day].forEach((sl, i) => {
-        lines.push(`  ${i + 1}. ${formatTime12h(sl.time)} — ${sl.studentName}`);
-      });
+      daySlots[day].forEach((sl, i) => { lines.push(`  ${i + 1}. ${formatTime12h(sl.time)} — ${sl.studentName}`); });
     }
     lines.push("\n─────────────────────────");
     lines.push(`إجمالي الحلقات الأسبوعية: ${totalSlots}`);
-    try {
-      await navigator.clipboard.writeText(lines.join("\n"));
-    } catch (e) {
-      console.error(e);
-    }
+    try { await navigator.clipboard.writeText(lines.join("\n")); } catch (e) { console.error(e); }
   }
 
-  const C = {
-    background: "var(--color-background-primary)",
-    borderRadius: 14,
-    border: "0.5px solid var(--color-border-tertiary)",
-    padding: "14px 15px",
-    marginBottom: 10,
-  };
+  const C = { background: "var(--color-background-primary)", borderRadius: 14, border: "0.5px solid var(--color-border-tertiary)", padding: "14px 15px", marginBottom: 10 };
 
   return (
     <div style={{ animation: "fadeUp .3s ease" }}>
-      <div
-        style={{
-          ...C,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+      <div style={{ ...C, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>
-          <div
-            style={{ fontSize: 15, fontWeight: 700, color: "var(--c-primary)" }}
-          >
-            الجدول الأسبوعي
-          </div>
-          <div
-            style={{
-              fontSize: 11,
-              color: "var(--color-text-tertiary)",
-              marginTop: 2,
-            }}
-          >
-            {activeDays.length}{" "}
-            {activeDays.length === 1 ? "يوم نشط" : "أيام نشطة"} · {totalSlots}{" "}
-            حلقة أسبوعياً
-          </div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--c-primary)" }}>الجدول الأسبوعي</div>
+          <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginTop: 2 }}>{activeDays.length} {activeDays.length === 1 ? "يوم نشط" : "أيام نشطة"} · {totalSlots} حلقة أسبوعياً</div>
         </div>
         <div style={{ fontSize: 28 }}>🗓️</div>
       </div>
-
       {totalSlots === 0 && (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "40px 20px",
-            background: "var(--color-background-primary)",
-            borderRadius: 14,
-            border: "2px dashed var(--color-border-secondary)",
-          }}
-        >
+        <div style={{ textAlign: "center", padding: "40px 20px", background: "var(--color-background-primary)", borderRadius: 14, border: "2px dashed var(--color-border-secondary)" }}>
           <div style={{ fontSize: 40, marginBottom: 10 }}>📭</div>
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: "var(--color-text-secondary)",
-              marginBottom: 6,
-            }}
-          >
-            لا توجد مواعيد مسجلة
-          </div>
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--color-text-tertiary)",
-              lineHeight: 1.6,
-            }}
-          >
-            أضف مواعيد للطلاب من تبويب الإعدادات ⚙️
-          </div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: 6 }}>لا توجد مواعيد مسجلة</div>
+          <div style={{ fontSize: 12, color: "var(--color-text-tertiary)", lineHeight: 1.6 }}>أضف مواعيد للطلاب من تبويب الإعدادات ⚙️</div>
         </div>
       )}
-
       {totalSlots > 0 && (
         <>
-          <div
-            ref={weekRef}
-            style={{
-              background: "#ffffff",
-              borderRadius: 12,
-              overflow: "hidden",
-              border: "1px solid #e5e7eb",
-              marginBottom: 10,
-              direction: "rtl",
-              fontFamily: "'Tajawal', Tahoma, sans-serif",
-            }}
-          >
-            <div
-              style={{
-                background: "#065f46",
-                color: "#fff",
-                padding: "14px 16px",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: 17, fontWeight: 700 }}>
-                الجدول الأسبوعي للحلقات
+          <div style={{ overflowX: "auto", width: "100%", marginBottom: 10 }}>
+            <div ref={weekRef} style={{ background: "#ffffff", borderRadius: 12, overflow: "hidden", border: "1px solid #e5e7eb", direction: "rtl", fontFamily: "'Tajawal', Tahoma, sans-serif", minWidth: "800px" }}>
+              <div style={{ background: "#065f46", color: "#fff", padding: "14px 16px", textAlign: "center" }}>
+                <div style={{ fontSize: 17, fontWeight: 700 }}>الجدول الأسبوعي للحلقات</div>
+                <div style={{ fontSize: 11, opacity: 0.85, marginTop: 3 }}>إجمالي {totalSlots} حلقة · {activeDays.length} أيام نشطة</div>
               </div>
-              <div style={{ fontSize: 11, opacity: 0.85, marginTop: 3 }}>
-                إجمالي {totalSlots} حلقة · {activeDays.length} أيام نشطة
-              </div>
-            </div>
-
-            <div style={{ overflowX: "auto" }}>
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  minWidth: activeDays.length * 120,
-                }}
-              >
-                <thead>
-                  <tr>
-                    {activeDays.map((day) => (
-                      <th
-                        key={day}
-                        style={{
-                          background: "#f0fdf4",
-                          color: "#065f46",
-                          padding: "10px 8px",
-                          fontSize: 13,
-                          fontWeight: 700,
-                          textAlign: "center",
-                          borderBottom: "2px solid #065f46",
-                          borderLeft: "1px solid #e5e7eb",
-                          minWidth: 120,
-                        }}
-                      >
-                        <div>{day}</div>
-                        <div
-                          style={{
-                            fontSize: 10,
-                            color: "#6b7280",
-                            fontWeight: 400,
-                            marginTop: 2,
-                          }}
-                        >
-                          {daySlots[day].length}{" "}
-                          {daySlots[day].length === 1 ? "حلقة" : "حلقات"}
-                        </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {Array.from({ length: maxSlotsInDay }).map((_, rowIdx) => (
-                    <tr
-                      key={rowIdx}
-                      style={{
-                        background: rowIdx % 2 === 0 ? "#fff" : "#f9fafb",
-                      }}
-                    >
-                      {activeDays.map((day) => {
-                        const slot = daySlots[day][rowIdx];
-                        return (
-                          <td
-                            key={day}
-                            style={{
-                              padding: "10px 8px",
-                              textAlign: "center",
-                              borderBottom: "1px solid #f3f4f6",
-                              borderLeft: "1px solid #f3f4f6",
-                              verticalAlign: "top",
-                            }}
-                          >
-                            {slot ? (
-                              <div>
-                                <div
-                                  style={{
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    color: "#065f46",
-                                    background: "#f0fdf4",
-                                    border: "1px solid #6ee7b7",
-                                    borderRadius: 20,
-                                    padding: "3px 8px",
-                                    display: "inline-block",
-                                    marginBottom: 4,
-                                    direction: "ltr",
-                                  }}
-                                >
-                                  {formatTime12h(slot.time)}
-                                </div>
-                                <div
-                                  style={{
-                                    fontSize: 12,
-                                    fontWeight: 600,
-                                    color: "#111827",
-                                  }}
-                                >
-                                  {slot.gender === "girl" ? "♀️" : "♂️"}{" "}
-                                  {slot.studentName}
-                                </div>
-                                <div
-                                  style={{
-                                    fontSize: 10,
-                                    color: "#9ca3af",
-                                    marginTop: 2,
-                                  }}
-                                >
-                                  {slot.sessionLimit} حصة
-                                </div>
-                              </div>
-                            ) : (
-                              <div style={{ color: "#e5e7eb", fontSize: 18 }}>
-                                —
-                              </div>
-                            )}
-                          </td>
-                        );
-                      })}
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: activeDays.length * 120 }}>
+                  <thead>
+                    <tr>
+                      {activeDays.map((day) => (
+                        <th key={day} style={{ background: "#f0fdf4", color: "#065f46", padding: "10px 8px", fontSize: 13, fontWeight: 700, textAlign: "center", borderBottom: "2px solid #065f46", borderLeft: "1px solid #e5e7eb", minWidth: 120 }}>
+                          <div>{day}</div>
+                          <div style={{ fontSize: 10, color: "#6b7280", fontWeight: 400, marginTop: 2 }}>{daySlots[day].length} {daySlots[day].length === 1 ? "حلقة" : "حلقات"}</div>
+                        </th>
+                      ))}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: maxSlotsInDay }).map((_, rowIdx) => (
+                      <tr key={rowIdx} style={{ background: rowIdx % 2 === 0 ? "#fff" : "#f9fafb" }}>
+                        {activeDays.map((day) => {
+                          const slot = daySlots[day][rowIdx];
+                          return (
+                            <td key={day} style={{ padding: "10px 8px", textAlign: "center", borderBottom: "1px solid #f3f4f6", borderLeft: "1px solid #f3f4f6", verticalAlign: "top" }}>
+                              {slot ? (
+                                <div>
+                                  <div style={{ fontSize: 13, fontWeight: 700, color: "#065f46", background: "#f0fdf4", border: "1px solid #6ee7b7", borderRadius: 20, padding: "3px 8px", display: "inline-block", marginBottom: 4, direction: "ltr" }}>{formatTime12h(slot.time)}</div>
+                                  <div style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>{slot.gender === "girl" ? "♀️" : "♂️"} {slot.studentName}</div>
+                                  <div style={{ fontSize: 10, color: "#9ca3af", marginTop: 2 }}>{slot.sessionLimit} حصة</div>
+                                </div>
+                              ) : (<div style={{ color: "#e5e7eb", fontSize: 18 }}>—</div>)}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}
-          >
-            <button
-              onClick={saveWeeklyImage}
-              style={{
-                background: "var(--c-primary)",
-                color: "#fff",
-                border: "none",
-                borderRadius: 12,
-                padding: "12px 8px",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              ⬇️ حفظ صورة 3K
-            </button>
-            <button
-              onClick={copyWeeklyAsText}
-              style={{
-                background: "var(--c-primary-bg)",
-                color: "var(--c-primary)",
-                border: "1px solid var(--c-primary-border)",
-                borderRadius: 12,
-                padding: "12px 8px",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              📋 نسخ للواتساب
-            </button>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            <button onClick={saveWeeklyImage} style={{ background: "var(--c-primary)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 8px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>⬇️ حفظ صورة 3K</button>
+            <button onClick={copyWeeklyAsText} style={{ background: "var(--c-primary-bg)", color: "var(--c-primary)", border: "1px solid var(--c-primary-border)", borderRadius: 12, padding: "12px 8px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>📋 نسخ للواتساب</button>
           </div>
         </>
       )}
@@ -1205,35 +553,19 @@ function MonthlySheetTab({ students, sessions, settings, showT }) {
       if (totalVisible > PAGE_SIZE_PDF) {
         await Promise.all([loadHtmlToImage(), loadJsPdf()]);
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-          orientation: "landscape",
-          unit: "mm",
-          format: "a4",
-        });
+        const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
         const pageW = pdf.internal.pageSize.getWidth();
         const pageH = pdf.internal.pageSize.getHeight();
 
         const chunks = [];
-        for (let i = 0; i < totalVisible; i += PAGE_SIZE_PDF) {
-          chunks.push(visibleStudents.slice(i, i + PAGE_SIZE_PDF));
-        }
+        for (let i = 0; i < totalVisible; i += PAGE_SIZE_PDF) chunks.push(visibleStudents.slice(i, i + PAGE_SIZE_PDF));
 
         for (let ci = 0; ci < chunks.length; ci++) {
           const chunk = chunks[ci];
-          const pageEl = buildSheetPageElement(
-            chunk,
-            year,
-            month,
-            settings,
-            getCount,
-            ci + 1,
-            chunks.length
-          );
+          const pageEl = buildSheetPageElement(chunk, year, month, settings, getCount, ci + 1, chunks.length);
           document.body.appendChild(pageEl);
           await document.fonts.ready;
-          await new Promise((r) =>
-            requestAnimationFrame(() => requestAnimationFrame(r))
-          );
+          await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
           const restore = freezeAnimations(pageEl);
           const dataUrl = await captureElement(pageEl, 2);
@@ -1274,10 +606,7 @@ function MonthlySheetTab({ students, sessions, settings, showT }) {
         return `${i + 1}. ${s.name}   ${c} / ${lim} حصة`;
       }),
       `─────────────────────────`,
-      `الإجمالي: ${visibleStudents.reduce(
-        (sum, s) => sum + getCount(s.id),
-        0
-      )} حصة`,
+      `الإجمالي: ${visibleStudents.reduce((sum, s) => sum + getCount(s.id), 0)} حصة`,
     ];
     navigator.clipboard
       .writeText(lines.join("\n"))
@@ -1286,130 +615,39 @@ function MonthlySheetTab({ students, sessions, settings, showT }) {
   }
 
   const prevMonth = () => {
-    if (month === 1) {
-      setYear((y) => y - 1);
-      setMonth(12);
-    } else setMonth((m) => m - 1);
+    if (month === 1) { setYear((y) => y - 1); setMonth(12); } else setMonth((m) => m - 1);
   };
   const nextMonth = () => {
-    if (month === 12) {
-      setYear((y) => y + 1);
-      setMonth(1);
-    } else setMonth((m) => m + 1);
+    if (month === 12) { setYear((y) => y + 1); setMonth(1); } else setMonth((m) => m + 1);
   };
 
-  const C = {
-    background: "var(--color-background-primary)",
-    borderRadius: 14,
-    border: "0.5px solid var(--color-border-tertiary)",
-    padding: "14px 15px",
-    marginBottom: 10,
-  };
+  const C = { background: "var(--color-background-primary)", borderRadius: 14, border: "0.5px solid var(--color-border-tertiary)", padding: "14px 15px", marginBottom: 10 };
 
   if (archiveKey) {
     const arch = archives.find((a) => a.key === archiveKey);
     return (
       <div style={{ animation: "fadeUp .3s ease" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 10,
-            marginBottom: 14,
-          }}
-        >
-          <button
-            onClick={() => setArchiveKey(null)}
-            style={{
-              background: "var(--color-background-secondary)",
-              border: "none",
-              padding: "6px 12px",
-              borderRadius: 14,
-              fontSize: 13,
-              cursor: "pointer",
-              color: "var(--color-text-secondary)",
-              fontWeight: 500,
-            }}
-          >
-            🔙 رجوع
-          </button>
-          <span
-            style={{ fontSize: 15, fontWeight: 700, color: "var(--c-primary)" }}
-          >
-            أرشيف: {arch?.label}
-          </span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <button onClick={() => setArchiveKey(null)} style={{ background: "var(--color-background-secondary)", border: "none", padding: "6px 12px", borderRadius: 14, fontSize: 13, cursor: "pointer", color: "var(--color-text-secondary)", fontWeight: 500 }}>🔙 رجوع</button>
+          <span style={{ fontSize: 15, fontWeight: 700, color: "var(--c-primary)" }}>أرشيف: {arch?.label}</span>
         </div>
         {arch?.data.map((row, i) => (
-          <div
-            key={row.id}
-            style={{
-              ...C,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 6,
-            }}
-          >
-            <span style={{ fontSize: 14, fontWeight: 500 }}>
-              {i + 1}. {row.name}
-            </span>
-            <span
-              style={{
-                fontSize: 13,
-                fontWeight: 700,
-                color:
-                  row.count >= row.limit
-                    ? "var(--c-primary)"
-                    : "var(--c-amber)",
-              }}
-            >
-              {row.count} / {row.limit}
-            </span>
+          <div key={row.id} style={{ ...C, display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+            <span style={{ fontSize: 14, fontWeight: 500 }}>{i + 1}. {row.name}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: row.count >= row.limit ? "var(--c-primary)" : "var(--c-amber)" }}>{row.count} / {row.limit}</span>
           </div>
         ))}
       </div>
     );
   }
 
-  const totalSessions = visibleStudents.reduce(
-    (s, st) => s + getCount(st.id),
-    0
-  );
+  const totalSessions = visibleStudents.reduce((s, st) => s + getCount(st.id), 0);
 
   return (
     <div style={{ animation: "fadeUp .3s ease" }}>
-      <div
-        style={{
-          display: "flex",
-          background: "var(--color-background-primary)",
-          borderRadius: 12,
-          border: "0.5px solid var(--color-border-tertiary)",
-          padding: 4,
-          marginBottom: 12,
-          gap: 4,
-        }}
-      >
-        {[
-          ["sheet", "📋", "الشيت الشهري"],
-          ["schedule", "🗓️", "الجدول الأسبوعي"],
-        ].map(([k, em, lb]) => (
-          <button
-            key={k}
-            onClick={() => setSubTab(k)}
-            style={{
-              flex: 1,
-              border: "none",
-              borderRadius: 9,
-              padding: "9px 4px",
-              fontSize: 12,
-              fontFamily: "inherit",
-              cursor: "pointer",
-              fontWeight: subTab === k ? 700 : 500,
-              background: subTab === k ? "var(--c-primary)" : "transparent",
-              color: subTab === k ? "#fff" : "var(--color-text-tertiary)",
-              transition: "all .2s",
-            }}
-          >
+      <div style={{ display: "flex", background: "var(--color-background-primary)", borderRadius: 12, border: "0.5px solid var(--color-border-tertiary)", padding: 4, marginBottom: 12, gap: 4 }}>
+        {[["sheet", "📋", "الشيت الشهري"], ["schedule", "🗓️", "الجدول الأسبوعي"]].map(([k, em, lb]) => (
+          <button key={k} onClick={() => setSubTab(k)} style={{ flex: 1, border: "none", borderRadius: 9, padding: "9px 4px", fontSize: 12, fontFamily: "inherit", cursor: "pointer", fontWeight: subTab === k ? 700 : 500, background: subTab === k ? "var(--c-primary)" : "transparent", color: subTab === k ? "#fff" : "var(--color-text-tertiary)", transition: "all .2s" }}>
             {em} {lb}
           </button>
         ))}
@@ -1417,501 +655,110 @@ function MonthlySheetTab({ students, sessions, settings, showT }) {
 
       {subTab === "sheet" && (
         <div style={{ animation: "fadeUp .25s ease" }}>
-          <div
-            style={{
-              ...C,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <button
-              onClick={prevMonth}
-              style={{
-                background: "var(--color-background-secondary)",
-                border: "none",
-                borderRadius: 10,
-                padding: "8px 14px",
-                fontSize: 16,
-                cursor: "pointer",
-              }}
-            >
-              ‹
-            </button>
+          <div style={{ ...C, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <button onClick={prevMonth} style={{ background: "var(--color-background-secondary)", border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 16, cursor: "pointer" }}>‹</button>
             <div style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: "var(--c-primary)",
-                }}
-              >
-                {getMonthLabel(year, month)}
+              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--c-primary)" }}>{getMonthLabel(year, month)}</div>
+              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>إجمالي الحصص: {totalSessions}</div>
+              {visibleStudents.length > PAGE_SIZE_PDF && <div style={{ fontSize: 10, color: "var(--c-amber)", marginTop: 2 }}>📄 {Math.ceil(visibleStudents.length / PAGE_SIZE_PDF)} صفحات PDF عند الحفظ</div>}
+            </div>
+            <button onClick={nextMonth} style={{ background: "var(--color-background-secondary)", border: "none", borderRadius: 10, padding: "8px 14px", fontSize: 16, cursor: "pointer" }}>›</button>
+          </div>
+
+          <div style={{ overflowX: "auto", width: "100%", marginBottom: 10 }}>
+            <div ref={sheetRef} style={{ background: "#ffffff", borderRadius: 12, overflow: "hidden", border: "1px solid #e5e7eb", direction: "rtl", fontFamily: "'Tajawal', Tahoma, sans-serif", minWidth: "600px" }}>
+              <div style={{ background: "#065f46", color: "#fff", padding: "14px 16px", textAlign: "center" }}>
+                <div style={{ fontSize: 17, fontWeight: 700 }}>شيت حضور حلقة القرآن الكريم</div>
+                <div style={{ fontSize: 12, opacity: 0.85, marginTop: 3 }}>{getMonthLabel(year, month)} · المعلم: {settings.teacherName || "محمد محمود"}</div>
               </div>
-              <div
-                style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}
-              >
-                إجمالي الحصص: {totalSessions}
-              </div>
-              {visibleStudents.length > PAGE_SIZE_PDF && (
-                <div
-                  style={{
-                    fontSize: 10,
-                    color: "var(--c-amber)",
-                    marginTop: 2,
-                  }}
-                >
-                  📄 {Math.ceil(visibleStudents.length / PAGE_SIZE_PDF)} صفحات
-                  PDF عند الحفظ
+              {students.length === 0 ? (
+                <div style={{ textAlign: "center", color: "#9ca3af", padding: "30px 0", fontSize: 13 }}>أضف طلاباً من الإعدادات أولاً</div>
+              ) : (
+                <div style={{ overflowX: "auto" }}>
+                  <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 400 }}>
+                    <thead>
+                      <tr style={{ background: "#f0fdf4" }}>
+                        <th style={{ padding: "10px 12px", textAlign: "right", fontSize: 12, fontWeight: 700, color: "#065f46", borderBottom: "2px solid #065f46", width: 36 }}>#</th>
+                        <th style={{ padding: "10px 12px", textAlign: "right", fontSize: 12, fontWeight: 700, color: "#065f46", borderBottom: "2px solid #065f46" }}>الطالب</th>
+                        <th style={{ padding: "10px 12px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#065f46", borderBottom: "2px solid #065f46", minWidth: 90 }}>الحضور</th>
+                        <th style={{ padding: "10px 12px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#065f46", borderBottom: "2px solid #065f46", minWidth: 140 }}>التقدم</th>
+                        <th style={{ padding: "10px 12px", textAlign: "center", fontSize: 12, fontWeight: 700, color: "#065f46", borderBottom: "2px solid #065f46", width: 70 }}>إجراء</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {students.map((s, i) => {
+                        const c = getCount(s.id);
+                        const lim = s.sessionLimit || settings.defaultLimit || 12;
+                        const pct = Math.round((c / lim) * 100);
+                        const isHid = hidden.includes(s.id);
+                        const barColor = pct >= 100 ? "#065f46" : pct >= 75 ? "#d97706" : "#1d4ed8";
+                        return (
+                          <tr key={s.id} style={{ background: isHid ? "#f9fafb" : i % 2 === 0 ? "#fff" : "#f9fafb", opacity: isHid ? 0.5 : 1, borderBottom: "1px solid #f3f4f6" }}>
+                            <td style={{ padding: "10px 12px", fontSize: 12, color: "#9ca3af", textAlign: "center" }}>{i + 1}</td>
+                            <td style={{ padding: "10px 12px", fontSize: 14, fontWeight: 600, color: "#111827" }}>{s.name}</td>
+                            <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                              {!isHid && (
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 5 }}>
+                                  <button onClick={() => setCountOverride(s.id, c - 1)} style={{ width: 24, height: 24, border: "0.5px solid #e5e7eb", borderRadius: 6, background: "#fee2e2", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#dc2626", lineHeight: 1 }}>−</button>
+                                  <span style={{ fontSize: 13, fontWeight: 700, color: c >= lim ? "#065f46" : "#b45309", minWidth: 50, textAlign: "center" }}>{c} / {lim}</span>
+                                  <button onClick={() => setCountOverride(s.id, c + 1)} style={{ width: 24, height: 24, border: "0.5px solid #e5e7eb", borderRadius: 6, background: "#d1fae5", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "#065f46", lineHeight: 1 }}>+</button>
+                                </div>
+                              )}
+                            </td>
+                            <td style={{ padding: "10px 12px" }}>
+                              {!isHid && (
+                                <div>
+                                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "#9ca3af", marginBottom: 3 }}>
+                                    <span>{pct}%</span>
+                                    <span>{c >= lim ? "✅ مكتمل" : `${lim - c} متبقي`}</span>
+                                  </div>
+                                  <div style={{ height: 8, background: "#f3f4f6", borderRadius: 4, overflow: "hidden" }}>
+                                    <div style={{ height: "100%", width: Math.min(100, pct) + "%", background: barColor, borderRadius: 4, transition: "width .4s" }} />
+                                  </div>
+                                </div>
+                              )}
+                            </td>
+                            <td style={{ padding: "10px 12px", textAlign: "center" }}>
+                              <button onClick={() => toggleHide(s.id)} style={{ background: isHid ? "#d1fae5" : "#f3f4f6", border: "none", borderRadius: 6, padding: "4px 8px", fontSize: 10, cursor: "pointer", color: isHid ? "#065f46" : "#9ca3af" }}>
+                                {isHid ? "إظهار" : "إخفاء"}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {students.length > 0 && (
+                        <tr style={{ background: "#f0fdf4", borderTop: "2px solid #065f46" }}>
+                          <td colSpan={2} style={{ padding: "10px 12px", fontSize: 13, fontWeight: 700, color: "#065f46" }}>الإجمالي الكلي</td>
+                          <td style={{ padding: "10px 12px", textAlign: "center", fontSize: 14, fontWeight: 700, color: "#065f46" }}>{totalSessions} حصة</td>
+                          <td colSpan={2}></td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               )}
             </div>
-            <button
-              onClick={nextMonth}
-              style={{
-                background: "var(--color-background-secondary)",
-                border: "none",
-                borderRadius: 10,
-                padding: "8px 14px",
-                fontSize: 16,
-                cursor: "pointer",
-              }}
-            >
-              ›
-            </button>
           </div>
 
-          <div
-            ref={sheetRef}
-            style={{
-              background: "#ffffff",
-              borderRadius: 12,
-              overflow: "hidden",
-              border: "1px solid #e5e7eb",
-              marginBottom: 10,
-              direction: "rtl",
-              fontFamily: "'Tajawal', Tahoma, sans-serif",
-            }}
-          >
-            <div
-              style={{
-                background: "#065f46",
-                color: "#fff",
-                padding: "14px 16px",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: 17, fontWeight: 700 }}>
-                شيت حضور حلقة القرآن الكريم
-              </div>
-              <div style={{ fontSize: 12, opacity: 0.85, marginTop: 3 }}>
-                {getMonthLabel(year, month)} · المعلم:{" "}
-                {settings.teacherName || "محمد محمود"}
-              </div>
-            </div>
-
-            {students.length === 0 ? (
-              <div
-                style={{
-                  textAlign: "center",
-                  color: "#9ca3af",
-                  padding: "30px 0",
-                  fontSize: 13,
-                }}
-              >
-                أضف طلاباً من الإعدادات أولاً
-              </div>
-            ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    minWidth: 400,
-                  }}
-                >
-                  <thead>
-                    <tr style={{ background: "#f0fdf4" }}>
-                      <th
-                        style={{
-                          padding: "10px 12px",
-                          textAlign: "right",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: "#065f46",
-                          borderBottom: "2px solid #065f46",
-                          width: 36,
-                        }}
-                      >
-                        #
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 12px",
-                          textAlign: "right",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: "#065f46",
-                          borderBottom: "2px solid #065f46",
-                        }}
-                      >
-                        الطالب
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 12px",
-                          textAlign: "center",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: "#065f46",
-                          borderBottom: "2px solid #065f46",
-                          minWidth: 90,
-                        }}
-                      >
-                        الحضور
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 12px",
-                          textAlign: "center",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: "#065f46",
-                          borderBottom: "2px solid #065f46",
-                          minWidth: 140,
-                        }}
-                      >
-                        التقدم
-                      </th>
-                      <th
-                        style={{
-                          padding: "10px 12px",
-                          textAlign: "center",
-                          fontSize: 12,
-                          fontWeight: 700,
-                          color: "#065f46",
-                          borderBottom: "2px solid #065f46",
-                          width: 70,
-                        }}
-                      >
-                        إجراء
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {students.map((s, i) => {
-                      const c = getCount(s.id);
-                      const lim = s.sessionLimit || settings.defaultLimit || 12;
-                      const pct = Math.round((c / lim) * 100);
-                      const isHid = hidden.includes(s.id);
-                      const barColor =
-                        pct >= 100
-                          ? "#065f46"
-                          : pct >= 75
-                          ? "#d97706"
-                          : "#1d4ed8";
-                      return (
-                        <tr
-                          key={s.id}
-                          style={{
-                            background: isHid
-                              ? "#f9fafb"
-                              : i % 2 === 0
-                              ? "#fff"
-                              : "#f9fafb",
-                            opacity: isHid ? 0.5 : 1,
-                            borderBottom: "1px solid #f3f4f6",
-                          }}
-                        >
-                          <td
-                            style={{
-                              padding: "10px 12px",
-                              fontSize: 12,
-                              color: "#9ca3af",
-                              textAlign: "center",
-                            }}
-                          >
-                            {i + 1}
-                          </td>
-                          <td
-                            style={{
-                              padding: "10px 12px",
-                              fontSize: 14,
-                              fontWeight: 600,
-                              color: "#111827",
-                            }}
-                          >
-                            {s.name}
-                          </td>
-                          <td
-                            style={{
-                              padding: "10px 12px",
-                              textAlign: "center",
-                            }}
-                          >
-                            {!isHid && (
-                              <div
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "center",
-                                  gap: 5,
-                                }}
-                              >
-                                <button
-                                  onClick={() => setCountOverride(s.id, c - 1)}
-                                  style={{
-                                    width: 24,
-                                    height: 24,
-                                    border: "0.5px solid #e5e7eb",
-                                    borderRadius: 6,
-                                    background: "#fee2e2",
-                                    cursor: "pointer",
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    color: "#dc2626",
-                                    lineHeight: 1,
-                                  }}
-                                >
-                                  −
-                                </button>
-                                <span
-                                  style={{
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    color: c >= lim ? "#065f46" : "#b45309",
-                                    minWidth: 50,
-                                    textAlign: "center",
-                                  }}
-                                >
-                                  {c} / {lim}
-                                </span>
-                                <button
-                                  onClick={() => setCountOverride(s.id, c + 1)}
-                                  style={{
-                                    width: 24,
-                                    height: 24,
-                                    border: "0.5px solid #e5e7eb",
-                                    borderRadius: 6,
-                                    background: "#d1fae5",
-                                    cursor: "pointer",
-                                    fontSize: 13,
-                                    fontWeight: 700,
-                                    color: "#065f46",
-                                    lineHeight: 1,
-                                  }}
-                                >
-                                  +
-                                </button>
-                              </div>
-                            )}
-                          </td>
-                          <td style={{ padding: "10px 12px" }}>
-                            {!isHid && (
-                              <div>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    fontSize: 10,
-                                    color: "#9ca3af",
-                                    marginBottom: 3,
-                                  }}
-                                >
-                                  <span>{pct}%</span>
-                                  <span>
-                                    {c >= lim ? "✅ مكتمل" : `${lim - c} متبقي`}
-                                  </span>
-                                </div>
-                                <div
-                                  style={{
-                                    height: 8,
-                                    background: "#f3f4f6",
-                                    borderRadius: 4,
-                                    overflow: "hidden",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      height: "100%",
-                                      width: Math.min(100, pct) + "%",
-                                      background: barColor,
-                                      borderRadius: 4,
-                                      transition: "width .4s",
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </td>
-                          <td
-                            style={{
-                              padding: "10px 12px",
-                              textAlign: "center",
-                            }}
-                          >
-                            <button
-                              onClick={() => toggleHide(s.id)}
-                              style={{
-                                background: isHid ? "#d1fae5" : "#f3f4f6",
-                                border: "none",
-                                borderRadius: 6,
-                                padding: "4px 8px",
-                                fontSize: 10,
-                                cursor: "pointer",
-                                color: isHid ? "#065f46" : "#9ca3af",
-                              }}
-                            >
-                              {isHid ? "إظهار" : "إخفاء"}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                    {students.length > 0 && (
-                      <tr
-                        style={{
-                          background: "#f0fdf4",
-                          borderTop: "2px solid #065f46",
-                        }}
-                      >
-                        <td
-                          colSpan={2}
-                          style={{
-                            padding: "10px 12px",
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: "#065f46",
-                          }}
-                        >
-                          الإجمالي الكلي
-                        </td>
-                        <td
-                          style={{
-                            padding: "10px 12px",
-                            textAlign: "center",
-                            fontSize: 14,
-                            fontWeight: 700,
-                            color: "#065f46",
-                          }}
-                        >
-                          {totalSessions} حصة
-                        </td>
-                        <td colSpan={2}></td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 8,
-              marginBottom: 10,
-            }}
-          >
-            <button
-              onClick={generateSheetImageOrPdf}
-              style={{
-                background: "var(--c-primary)",
-                color: "#fff",
-                border: "none",
-                borderRadius: 12,
-                padding: "12px 8px",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              {visibleStudents.length > PAGE_SIZE_PDF
-                ? "⬇️ حفظ PDF"
-                : "⬇️ حفظ صورة 3K"}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+            <button onClick={generateSheetImageOrPdf} style={{ background: "var(--c-primary)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 8px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+              {visibleStudents.length > PAGE_SIZE_PDF ? "⬇️ حفظ PDF" : "⬇️ حفظ صورة 3K"}
             </button>
-            <button
-              onClick={copyAsText}
-              style={{
-                background: "var(--c-primary-bg)",
-                color: "var(--c-primary)",
-                border: "1px solid var(--c-primary-border)",
-                borderRadius: 12,
-                padding: "12px 8px",
-                fontSize: 13,
-                fontWeight: 700,
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
+            <button onClick={copyAsText} style={{ background: "var(--c-primary-bg)", color: "var(--c-primary)", border: "1px solid var(--c-primary-border)", borderRadius: 12, padding: "12px 8px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
               📋 نسخ للواتساب
             </button>
           </div>
-          <button
-            onClick={archiveMonth}
-            style={{
-              width: "100%",
-              background: "var(--c-amber-bg)",
-              color: "var(--c-amber)",
-              border: "1px solid var(--c-amber-border)",
-              borderRadius: 12,
-              padding: "11px",
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: "pointer",
-              fontFamily: "inherit",
-              marginBottom: 10,
-            }}
-          >
+          <button onClick={archiveMonth} style={{ width: "100%", background: "var(--c-amber-bg)", color: "var(--c-amber)", border: "1px solid var(--c-amber-border)", borderRadius: 12, padding: "11px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", marginBottom: 10 }}>
             🗄️ أرشفة هذا الشهر
           </button>
 
           {archives.length > 0 && (
-            <div
-              style={{
-                background: "var(--color-background-primary)",
-                borderRadius: 14,
-                border: "0.5px solid var(--color-border-tertiary)",
-                padding: "14px 15px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: "var(--color-text-primary)",
-                  marginBottom: 10,
-                }}
-              >
-                🗄️ الأرشيف ({archives.length} شهر)
-              </div>
+            <div style={{ background: "var(--color-background-primary)", borderRadius: 14, border: "0.5px solid var(--color-border-tertiary)", padding: "14px 15px" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-text-primary)", marginBottom: 10 }}>🗄️ الأرشيف ({archives.length} شهر)</div>
               {archives.map((a) => (
-                <button
-                  key={a.key}
-                  onClick={() => setArchiveKey(a.key)}
-                  style={{
-                    width: "100%",
-                    textAlign: "right",
-                    background: "var(--color-background-secondary)",
-                    border: "none",
-                    borderRadius: 10,
-                    padding: "10px 12px",
-                    marginBottom: 6,
-                    fontSize: 13,
-                    fontWeight: 500,
-                    cursor: "pointer",
-                    color: "var(--color-text-primary)",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    fontFamily: "inherit",
-                  }}
-                >
+                <button key={a.key} onClick={() => setArchiveKey(a.key)} style={{ width: "100%", textAlign: "right", background: "var(--color-background-secondary)", border: "none", borderRadius: 10, padding: "10px 12px", marginBottom: 6, fontSize: 13, fontWeight: 500, cursor: "pointer", color: "var(--color-text-primary)", display: "flex", justifyContent: "space-between", fontFamily: "inherit" }}>
                   <span>{a.label}</span>
-                  <span style={{ color: "var(--c-primary)", fontWeight: 700 }}>
-                    عرض ›
-                  </span>
+                  <span style={{ color: "var(--c-primary)", fontWeight: 700 }}>عرض ›</span>
                 </button>
               ))}
             </div>
@@ -1924,23 +771,9 @@ function MonthlySheetTab({ students, sessions, settings, showT }) {
   );
 }
 
-function buildSheetPageElement(
-  chunkStudents,
-  year,
-  month,
-  settings,
-  getCount,
-  pageNum,
-  totalPages
-) {
+function buildSheetPageElement(chunkStudents, year, month, settings, getCount, pageNum, totalPages) {
   const el = document.createElement("div");
-  el.style.cssText = `
-    position: fixed; left: -9999px; top: 0;
-    width: 1122px; background: #ffffff;
-    font-family: 'Tajawal', Tahoma, sans-serif;
-    direction: rtl; padding: 0;
-  `;
-
+  el.style.cssText = `position: fixed; left: -9999px; top: 0; width: 1122px; background: #ffffff; font-family: 'Tajawal', Tahoma, sans-serif; direction: rtl; padding: 0;`;
   const monthLabel = getMonthLabel(year, month);
   const teacherName = settings.teacherName || "محمد محمود";
   const defaultLimit = settings.defaultLimit || 12;
@@ -1949,9 +782,7 @@ function buildSheetPageElement(
   el.innerHTML = `
     <div style="background:#065f46;color:#fff;padding:20px 24px;text-align:center;">
       <div style="font-size:20px;font-weight:700;">شيت حضور حلقة القرآن الكريم</div>
-      <div style="font-size:13px;opacity:0.85;margin-top:4px;">${monthLabel} · المعلم: ${teacherName}${
-    totalPages > 1 ? ` · صفحة ${pageNum} من ${totalPages}` : ""
-  }</div>
+      <div style="font-size:13px;opacity:0.85;margin-top:4px;">${monthLabel} · المعلم: ${teacherName}${totalPages > 1 ? ` · صفحة ${pageNum} من ${totalPages}` : ""}</div>
     </div>
     <table style="width:100%;border-collapse:collapse;">
       <thead>
@@ -1963,25 +794,17 @@ function buildSheetPageElement(
         </tr>
       </thead>
       <tbody>
-        ${chunkStudents
-          .map((s, i) => {
+        ${chunkStudents.map((s, i) => {
             const c = getCount(s.id);
             const lim = s.sessionLimit || defaultLimit;
             const pct = Math.min(100, Math.round((c / lim) * 100));
-            const barColor =
-              pct >= 100 ? "#065f46" : pct >= 75 ? "#d97706" : "#1d4ed8";
+            const barColor = pct >= 100 ? "#065f46" : pct >= 75 ? "#d97706" : "#1d4ed8";
             const rowBg = i % 2 === 0 ? "#fff" : "#f9fafb";
             return `
             <tr style="background:${rowBg};border-bottom:1px solid #f3f4f6;">
-              <td style="padding:12px 14px;font-size:12px;color:#9ca3af;text-align:center;">${
-                i + 1
-              }</td>
-              <td style="padding:12px 14px;font-size:15px;font-weight:600;color:#111827;">${
-                s.name
-              }</td>
-              <td style="padding:12px 14px;text-align:center;font-size:14px;font-weight:700;color:${
-                c >= lim ? "#065f46" : "#b45309"
-              };">${c} / ${lim}</td>
+              <td style="padding:12px 14px;font-size:12px;color:#9ca3af;text-align:center;">${i + 1}</td>
+              <td style="padding:12px 14px;font-size:15px;font-weight:600;color:#111827;">${s.name}</td>
+              <td style="padding:12px 14px;text-align:center;font-size:14px;font-weight:700;color:${c >= lim ? "#065f46" : "#b45309"};">${c} / ${lim}</td>
               <td style="padding:12px 14px;">
                 <div style="display:flex;align-items:center;gap:8px;">
                   <div style="flex:1;height:10px;background:#f3f4f6;border-radius:5px;overflow:hidden;">
@@ -1992,8 +815,7 @@ function buildSheetPageElement(
               </td>
             </tr>
           `;
-          })
-          .join("")}
+          }).join("")}
         <tr style="background:#f0fdf4;border-top:2px solid #065f46;">
           <td colspan="2" style="padding:12px 14px;font-size:14px;font-weight:700;color:#065f46;">الإجمالي الكلي</td>
           <td style="padding:12px 14px;text-align:center;font-size:15px;font-weight:700;color:#065f46;">${totalSess} حصة</td>
@@ -2065,7 +887,7 @@ const CSS_VARS = `
 // ════════════════════════════════════════════════════════════════════════════════
 function DashboardContent({ user, onLogout }) {
   const [tab, setTab] = useState("form");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // State للقائمة الجانبية
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [students, setStudents] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [settings, setSettings] = useState({
@@ -2657,13 +1479,13 @@ function DashboardContent({ user, onLogout }) {
     showT("⏳ جاري حفظ الصورة...");
     try {
       const restore = freezeAnimations(reportRef.current);
-      const dataUrl = await captureElement(reportRef.current, 2);
+      const dataUrl = await captureElement(reportRef.current, 3);
       restore();
       const a = document.createElement("a");
       a.href = dataUrl;
       a.download = `تقرير_${previewSession?.studentName}_${previewSession?.date}.png`;
       a.click();
-      showT("✅ تم حفظ الصورة!");
+      showT("✅ تم حفظ الصورة بنجاح!");
     } catch (e) {
       console.error("خطأ في حفظ الصورة:", e);
       showT("❌ حدث خطأ في الحفظ: " + e.message, "warn");
@@ -2677,17 +1499,21 @@ function DashboardContent({ user, onLogout }) {
       await loadHtmlToImage();
       const restore = freezeAnimations(reportRef.current);
       await document.fonts.ready;
-      await new Promise((r) =>
-        requestAnimationFrame(() => requestAnimationFrame(r))
-      );
+      await new Promise((r) => setTimeout(r, 600));
+
       const blob = await window.htmlToImage.toBlob(reportRef.current, {
         backgroundColor: "#ffffff",
-        pixelRatio: 2,
+        pixelRatio: 3,
         cacheBust: true,
         useCORS: true,
+        style: {
+          transform: "scale(1)",
+          transformOrigin: "top left"
+        }
       });
       restore();
-      if (!blob) return showT("❌ حدث خطأ", "warn");
+      if (!blob) return showT("❌ حدث خطأ في استخراج الصورة", "warn");
+      
       const file = new File([blob], `تقرير_${previewSession.studentName}.png`, {
         type: "image/png",
       });
@@ -2702,27 +1528,27 @@ function DashboardContent({ user, onLogout }) {
           ]);
           showT("✅ تم نسخ الصورة! الصقها في الواتساب");
         } catch {
-          showT("⚠️ متصفحك يمنع النسخ. احفظ الصورة أولاً.", "warn");
+          showT("⚠️ متصفحك يمنع النسخ المباشر. احفظ الصورة أولاً.", "warn");
         }
       }
     } catch (e) {
       console.error("خطأ في مشاركة الصورة:", e);
-      showT("❌ حدث خطأ", "warn");
+      showT("❌ حدث خطأ أثناء التجهيز", "warn");
     }
   }
 
   async function downloadCertificate() {
     if (!certRef.current) return;
-    showT("⏳ جاري تجهيز الشهادة بجودة 4K...");
+    showT("⏳ جاري تجهيز الشهادة بجودة عالية...");
     try {
       const restore = freezeAnimations(certRef.current);
-      const dataUrl = await captureElement(certRef.current, 4);
+      const dataUrl = await captureElement(certRef.current, 3);
       restore();
       const a = document.createElement("a");
       a.href = dataUrl;
       a.download = `شهادة_${showReward.name}.png`;
       a.click();
-      showT("✅ تم حفظ الشهادة بجودة 4K!");
+      showT("✅ تم حفظ الشهادة بنجاح!");
     } catch (e) {
       console.error("خطأ في حفظ الشهادة:", e);
       showT("❌ حدث خطأ: " + e.message, "warn");
@@ -2736,8 +1562,9 @@ function DashboardContent({ user, onLogout }) {
       const [workerUrl] = await Promise.all([loadGifJs(), loadHtmlToImage()]);
       const el = certRef.current;
       const SCALE = 1.5,
-        W = Math.round(el.scrollWidth * SCALE),
-        H = Math.round(el.scrollHeight * SCALE);
+        W = Math.round(el.offsetWidth * SCALE),
+        H = Math.round(el.offsetHeight * SCALE);
+        
       const gif = new window.GIF({
         workers: 2,
         quality: 8,
@@ -2970,43 +1797,43 @@ function DashboardContent({ user, onLogout }) {
   function renderIslamicPreview(sess) {
     const isl = sess.islamic;
     return (
-      <div style={{ padding: "20px" }}>
+      <div style={{ padding: "30px", background: "#ffffff" }}>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             background: "#f3f4f6",
-            padding: "12px 14px",
-            borderRadius: 10,
-            marginBottom: 18,
+            padding: "16px 20px",
+            borderRadius: 12,
+            marginBottom: 24,
           }}
         >
-          <div style={{ fontSize: 14, fontWeight: 700, color: "#111827" }}>
+          <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>
             👤 {sess.studentName}
           </div>
-          <div style={{ fontSize: 12, color: "#4b5563" }}>{sess.dateAr}</div>
+          <div style={{ fontSize: 16, color: "#4b5563" }}>{sess.dateAr}</div>
         </div>
         <div
           style={{
             background: "#fef3c7",
-            borderRadius: 10,
-            padding: "10px 12px",
-            marginBottom: 14,
+            borderRadius: 12,
+            padding: "16px 20px",
+            marginBottom: 20,
             border: "1px solid #fcd34d",
           }}
         >
           <div
             style={{
-              fontSize: 13,
+              fontSize: 18,
               fontWeight: 700,
               color: "#92400e",
-              marginBottom: 4,
+              marginBottom: 8,
             }}
           >
             📘 تربية إسلامية
           </div>
-          <div style={{ fontSize: 13, color: "#4b5563" }}>
+          <div style={{ fontSize: 16, color: "#4b5563", lineHeight: 1.8 }}>
             {isl?.general || "—"}
           </div>
         </div>
@@ -3018,17 +1845,17 @@ function DashboardContent({ user, onLogout }) {
               <div
                 key={i}
                 style={{
-                  marginBottom: 12,
-                  borderRight: "4px solid #f59e0b",
-                  paddingRight: 8,
+                  marginBottom: 16,
+                  borderRight: "5px solid #f59e0b",
+                  paddingRight: 12,
                 }}
               >
                 <div
                   style={{
-                    fontSize: 13,
+                    fontSize: 18,
                     fontWeight: 700,
                     color: "#92400e",
-                    marginBottom: 4,
+                    marginBottom: 6,
                   }}
                 >
                   {label}
@@ -3038,9 +1865,9 @@ function DashboardContent({ user, onLogout }) {
                     <div
                       key={k}
                       style={{
-                        fontSize: 12,
+                        fontSize: 16,
                         color: "#4b5563",
-                        marginBottom: 2,
+                        marginBottom: 4,
                       }}
                     >
                       <strong>
@@ -3057,23 +1884,23 @@ function DashboardContent({ user, onLogout }) {
           <div
             style={{
               background: "#f0fdf4",
-              borderRadius: 10,
-              padding: "10px",
+              borderRadius: 12,
+              padding: "16px",
               border: "1px dashed #6ee7b7",
-              marginBottom: 12,
+              marginBottom: 16,
             }}
           >
             <div
               style={{
-                fontSize: 12,
+                fontSize: 16,
                 fontWeight: 700,
                 color: "#065f46",
-                marginBottom: 4,
+                marginBottom: 6,
               }}
             >
               ➕ إضافات أخرى
             </div>
-            <div style={{ fontSize: 12, color: "#4b5563" }}>{isl.custom}</div>
+            <div style={{ fontSize: 16, color: "#4b5563", lineHeight: 1.8 }}>{isl.custom}</div>
           </div>
         )}
         <div
@@ -3081,10 +1908,10 @@ function DashboardContent({ user, onLogout }) {
             display: "flex",
             justifyContent: "space-around",
             background: "#f9fafb",
-            padding: "12px 8px",
-            borderRadius: 10,
+            padding: "20px 16px",
+            borderRadius: 12,
             border: "1px solid #e5e7eb",
-            marginBottom: 20,
+            marginBottom: 24,
           }}
         >
           {[
@@ -3095,15 +1922,15 @@ function DashboardContent({ user, onLogout }) {
             <div key={lb} style={{ textAlign: "center" }}>
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: 16,
                   fontWeight: 700,
                   color: "#4b5563",
-                  marginBottom: 4,
+                  marginBottom: 8,
                 }}
               >
                 {lb}
               </div>
-              <div style={{ fontSize: 12, letterSpacing: 2 }}>
+              <div style={{ fontSize: 18, letterSpacing: 3 }}>
                 {"⭐".repeat(v || 0)}
               </div>
             </div>
@@ -3113,23 +1940,23 @@ function DashboardContent({ user, onLogout }) {
           <div
             style={{
               background: "#f0fdf4",
-              padding: "12px",
-              borderRadius: 10,
+              padding: "16px",
+              borderRadius: 12,
               border: "1px solid #bbf7d0",
             }}
           >
             <div
               style={{
-                fontSize: 13,
+                fontSize: 18,
                 fontWeight: 700,
                 color: "#065f46",
-                marginBottom: 6,
+                marginBottom: 8,
                 textAlign: "center",
               }}
             >
               📚 واجب الحصة القادمة
             </div>
-            <div style={{ fontSize: 13, color: "#4b5563" }}>{isl.hw}</div>
+            <div style={{ fontSize: 16, color: "#4b5563", textAlign: "center", lineHeight: 1.8 }}>{isl.hw}</div>
           </div>
         )}
       </div>
@@ -3146,35 +1973,6 @@ function DashboardContent({ user, onLogout }) {
         position: "relative",
       }}
     >
-      {toast && (
-        <div
-          role="alert"
-          aria-live="polite"
-          style={{
-            position: "fixed",
-            top: 12,
-            left: "50%",
-            transform: "translateX(-50%)",
-            background:
-              toast.type === "warn"
-                ? "var(--c-amber-light)"
-                : "var(--c-primary-light)",
-            color:
-              toast.type === "warn" ? "var(--c-amber)" : "var(--c-primary)",
-            padding: "8px 18px",
-            borderRadius: 20,
-            fontSize: 13,
-            fontWeight: 500,
-            zIndex: 9999,
-            whiteSpace: "nowrap",
-            boxShadow: "0 2px 8px rgba(0,0,0,.1)",
-            animation: "fadeUp .25s ease",
-          }}
-        >
-          {toast.msg}
-        </div>
-      )}
-
       {/* ── HEADER ── */}
       <div 
         style={{ 
@@ -3189,7 +1987,6 @@ function DashboardContent({ user, onLogout }) {
           boxShadow: "0 2px 10px rgba(0,0,0,0.1)"
         }}
       >
-        {/* زرار القائمة (متثبت على اليمين) */}
         <button 
           onClick={() => setIsSidebarOpen(true)} 
           style={{ 
@@ -3206,7 +2003,6 @@ function DashboardContent({ user, onLogout }) {
           ☰
         </button>
 
-        {/* اللوجو والاسم (متسنتر في النص) */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <img 
             src="/logo.png" 
@@ -3217,7 +2013,6 @@ function DashboardContent({ user, onLogout }) {
               objectFit: "contain", 
               filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.2))" 
             }} 
-            /* لو الصورة مش موجودة هيخفي الأيقونة المكسورة */
             onError={(e) => e.target.style.display='none'} 
           />
           <div style={{ color: "#fff", fontWeight: "800", fontSize: 22, fontFamily: "var(--font-quran, 'Tajawal', sans-serif)" }}>
@@ -3252,13 +2047,11 @@ function DashboardContent({ user, onLogout }) {
               boxShadow: "-5px 0 15px rgba(0,0,0,0.3)"
             }}
           >
-            {/* رأس القائمة */}
             <div style={{ background: "#065f46", padding: "30px 20px", color: "#fff", borderBottomLeftRadius: 15 }}>
               <div style={{ fontSize: 22, fontWeight: "800" }}>القائمة الرئيسية</div>
               <div style={{ fontSize: 13, opacity: 0.9, marginTop: 5 }}>👤 أهلاً بك، {TEACHER}</div>
             </div>
 
-            {/* روابط التنقل */}
             <div style={{ padding: 15, flex: 1, overflowY: "auto" }}>
               {[
                 ["form", "🏠", "الرئيسية (تسجيل)"],
@@ -3292,7 +2085,6 @@ function DashboardContent({ user, onLogout }) {
               ))}
             </div>
 
-            {/* زرار الخروج تحت خالص */}
             <div style={{ padding: 20, borderTop: "1px solid #f3f4f6", background: "#fafafa" }}>
                <button 
                   onClick={onLogout} 
@@ -5629,7 +4421,7 @@ function DashboardContent({ user, onLogout }) {
         )}
       </div>
 
-      {/* ══ PREVIEW MODAL ══ */}
+      {/* ══ PREVIEW MODAL (FIXED FOR HIGH-RES EXPORT) ══ */}
       {previewSession &&
         (() => {
           const stu = students.find((x) => x.id === previewSession.studentId);
@@ -5656,7 +4448,7 @@ function DashboardContent({ user, onLogout }) {
                 ref={previewRef}
                 style={{
                   width: "100%",
-                  maxWidth: 400,
+                  maxWidth: "500px",
                   background: "#fff",
                   borderRadius: 16,
                   overflow: "hidden",
@@ -5664,16 +4456,21 @@ function DashboardContent({ user, onLogout }) {
                   animation: "popIn .3s ease",
                   display: "flex",
                   flexDirection: "column",
-                  maxHeight: "min(95dvh, 95vh)",
+                  maxHeight: "95vh",
                 }}
               >
-                <div style={{ overflowY: "auto", flex: 1 }}>
+                {/* الحل السحري هنا: غلفنا المحتوى بـ div بيعمل Scroll 
+                  بحيث اللي جوه ياخد عرض ثابت 750px ومينضغطش أبداً 
+                */}
+                <div style={{ overflowX: "auto", overflowY: "auto", flex: 1 }}>
                   <div
                     ref={reportRef}
                     style={{
+                      width: "750px", // عرض ثابت عشان الصورة تطلع بجودة A4 دايماً
+                      margin: "0 auto",
                       padding: 0,
                       background: "#ffffff",
-                      fontFamily: "var(--font-sans)",
+                      fontFamily: "'Tajawal', sans-serif",
                       direction: "rtl",
                     }}
                   >
@@ -5683,15 +4480,15 @@ function DashboardContent({ user, onLogout }) {
                           ? "var(--c-amber-mid)"
                           : "var(--c-primary)",
                         color: "#fff",
-                        padding: "20px 15px",
+                        padding: "30px 20px",
                         textAlign: "center",
                       }}
                     >
                       <h2
                         style={{
                           margin: 0,
-                          fontSize: 26,
-                          fontFamily: "var(--font-quran)",
+                          fontSize: 34,
+                          fontFamily: "'Amiri', serif",
                           fontWeight: 700,
                         }}
                       >
@@ -5701,8 +4498,8 @@ function DashboardContent({ user, onLogout }) {
                       </h2>
                       <p
                         style={{
-                          margin: "6px 0 0",
-                          fontSize: 14,
+                          margin: "10px 0 0",
+                          fontSize: 18,
                           opacity: 0.9,
                         }}
                       >
@@ -5712,28 +4509,28 @@ function DashboardContent({ user, onLogout }) {
                     {isIslamic ? (
                       renderIslamicPreview(previewSession)
                     ) : (
-                      <div style={{ padding: "20px" }}>
+                      <div style={{ padding: "30px" }}>
                         <div
                           style={{
                             display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
                             background: "#f3f4f6",
-                            padding: "12px 14px",
-                            borderRadius: 10,
-                            marginBottom: 18,
+                            padding: "16px 20px",
+                            borderRadius: 12,
+                            marginBottom: 24,
                           }}
                         >
                           <div
                             style={{
-                              fontSize: 14,
+                              fontSize: 18,
                               fontWeight: 700,
                               color: "#111827",
                             }}
                           >
                             👤 {previewSession.studentName}
                           </div>
-                          <div style={{ fontSize: 12, color: "#4b5563" }}>
+                          <div style={{ fontSize: 16, color: "#4b5563" }}>
                             {previewSession.dateAr}
                           </div>
                         </div>
@@ -5778,14 +4575,14 @@ function DashboardContent({ user, onLogout }) {
                             notes,
                             tajweedList,
                           ]) => (
-                            <div key={title} style={{ marginBottom: 16 }}>
+                            <div key={title} style={{ marginBottom: 20 }}>
                               <h3
                                 style={{
-                                  fontSize: 15,
+                                  fontSize: 20,
                                   color: "#111827",
-                                  margin: "0 0 8px",
-                                  borderRight: `4px solid ${color}`,
-                                  paddingRight: 8,
+                                  margin: "0 0 10px",
+                                  borderRight: `5px solid ${color}`,
+                                  paddingRight: 10,
                                 }}
                               >
                                 {title}
@@ -5793,9 +4590,9 @@ function DashboardContent({ user, onLogout }) {
                               <p
                                 style={{
                                   margin: 0,
-                                  fontSize: 14,
+                                  fontSize: 18,
                                   color: "#4b5563",
-                                  lineHeight: 1.6,
+                                  lineHeight: 1.8,
                                 }}
                               >
                                 {text || "—"}
@@ -5803,8 +4600,8 @@ function DashboardContent({ user, onLogout }) {
                               {rating && (
                                 <p
                                   style={{
-                                    margin: "4px 0 0",
-                                    fontSize: 12,
+                                    margin: "6px 0 0",
+                                    fontSize: 15,
                                     color: color,
                                     fontWeight: 700,
                                   }}
@@ -5815,8 +4612,8 @@ function DashboardContent({ user, onLogout }) {
                               {tajweedList?.length > 0 && (
                                 <p
                                   style={{
-                                    margin: "4px 0 0",
-                                    fontSize: 12,
+                                    margin: "6px 0 0",
+                                    fontSize: 15,
                                     color: "#dc2626",
                                   }}
                                 >
@@ -5826,8 +4623,8 @@ function DashboardContent({ user, onLogout }) {
                               {notes && (
                                 <p
                                   style={{
-                                    margin: "4px 0 0",
-                                    fontSize: 12,
+                                    margin: "6px 0 0",
+                                    fontSize: 15,
                                     color: "#6b7280",
                                   }}
                                 >
@@ -5842,10 +4639,10 @@ function DashboardContent({ user, onLogout }) {
                             display: "flex",
                             justifyContent: "space-around",
                             background: "#f9fafb",
-                            padding: "12px 8px",
-                            borderRadius: 10,
+                            padding: "20px 16px",
+                            borderRadius: 12,
                             border: "1px solid #e5e7eb",
-                            marginBottom: 20,
+                            marginBottom: 24,
                           }}
                         >
                           {[
@@ -5856,15 +4653,15 @@ function DashboardContent({ user, onLogout }) {
                             <div key={lb} style={{ textAlign: "center" }}>
                               <div
                                 style={{
-                                  fontSize: 12,
+                                  fontSize: 16,
                                   fontWeight: 700,
                                   color: "#4b5563",
-                                  marginBottom: 4,
+                                  marginBottom: 6,
                                 }}
                               >
                                 {lb}
                               </div>
-                              <div style={{ fontSize: 12, letterSpacing: 2 }}>
+                              <div style={{ fontSize: 18, letterSpacing: 3 }}>
                                 {"⭐".repeat(v || 0)}
                               </div>
                             </div>
@@ -5873,89 +4670,54 @@ function DashboardContent({ user, onLogout }) {
                         <div
                           style={{
                             background: "#f0fdf4",
-                            padding: "14px",
-                            borderRadius: 10,
+                            padding: "20px",
+                            borderRadius: 12,
                             border: "1px solid #bbf7d0",
-                            marginBottom: 16,
+                            marginBottom: 20,
                           }}
                         >
                           <h3
                             style={{
-                              fontSize: 15,
+                              fontSize: 18,
                               color: "#065f46",
-                              margin: "0 0 10px",
+                              margin: "0 0 12px",
                               textAlign: "center",
                               fontWeight: 700,
                             }}
                           >
                             📚 واجب الحلقة القادمة
                           </h3>
-                          {previewSession.hw?.new?.surah && (
-                            <div style={{ fontSize: 13, marginBottom: 6 }}>
-                              <strong style={{ color: "#065f46" }}>
-                                ✨ تسميع:
-                              </strong>{" "}
-                              {previewSession.hw.new.surah}{" "}
-                              {previewSession.hw.new.from && (
-                                <span style={{ color: "#4b5563" }}>
-                                  (من {previewSession.hw.new.from} لـ{" "}
-                                  {previewSession.hw.new.to})
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          {previewSession.hw?.recent?.surah && (
-                            <div style={{ fontSize: 13, marginBottom: 6 }}>
-                              <strong style={{ color: "#1d4ed8" }}>
-                                🔄 قريب:
-                              </strong>{" "}
-                              {previewSession.hw.recent.surah}{" "}
-                              {previewSession.hw.recent.from && (
-                                <span style={{ color: "#4b5563" }}>
-                                  (من {previewSession.hw.recent.from} لـ{" "}
-                                  {previewSession.hw.recent.to})
-                                </span>
-                              )}
-                            </div>
-                          )}
-                          {previewSession.hw?.distant?.surah && (
-                            <div style={{ fontSize: 13 }}>
-                              <strong style={{ color: "#92400e" }}>
-                                🕰️ بعيد:
-                              </strong>{" "}
-                              {previewSession.hw.distant.surah}{" "}
-                              {previewSession.hw.distant.from && (
-                                <span style={{ color: "#4b5563" }}>
-                                  (من {previewSession.hw.distant.from} لـ{" "}
-                                  {previewSession.hw.distant.to})
-                                </span>
-                              )}
-                            </div>
-                          )}
+                          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 15, textAlign: "center" }}>
+                            {previewSession.hw?.new?.surah ? (
+                              <div>
+                                <strong style={{ color: "#065f46", display: "block", marginBottom: 5 }}>✨ تسميع:</strong>
+                                <span style={{ fontSize: 16 }}>{previewSession.hw.new.surah}</span>
+                                {previewSession.hw.new.from && <div style={{ fontSize: 13, color: "#4b5563", marginTop: 4 }}>(من {previewSession.hw.new.from} لـ {previewSession.hw.new.to})</div>}
+                              </div>
+                            ) : <div></div>}
+                            {previewSession.hw?.recent?.surah ? (
+                              <div>
+                                <strong style={{ color: "#1d4ed8", display: "block", marginBottom: 5 }}>🔄 قريب:</strong>
+                                <span style={{ fontSize: 16 }}>{previewSession.hw.recent.surah}</span>
+                                {previewSession.hw.recent.from && <div style={{ fontSize: 13, color: "#4b5563", marginTop: 4 }}>(من {previewSession.hw.recent.from} لـ {previewSession.hw.recent.to})</div>}
+                              </div>
+                            ) : <div></div>}
+                            {previewSession.hw?.distant?.surah ? (
+                              <div>
+                                <strong style={{ color: "#92400e", display: "block", marginBottom: 5 }}>🕰️ بعيد:</strong>
+                                <span style={{ fontSize: 16 }}>{previewSession.hw.distant.surah}</span>
+                                {previewSession.hw.distant.from && <div style={{ fontSize: 13, color: "#4b5563", marginTop: 4 }}>(من {previewSession.hw.distant.from} لـ {previewSession.hw.distant.to})</div>}
+                              </div>
+                            ) : <div></div>}
+                          </div>
                           {!previewSession.hw?.new?.surah &&
                             !previewSession.hw?.recent?.surah &&
                             !previewSession.hw?.distant?.surah && (
-                              <div
-                                style={{
-                                  fontSize: 13,
-                                  color: "#9ca3af",
-                                  textAlign: "center",
-                                }}
-                              >
-                                لا يوجد واجب مسجل
-                              </div>
+                              <div style={{ fontSize: 16, color: "#9ca3af", textAlign: "center" }}>لا يوجد واجب مسجل</div>
                             )}
                         </div>
-                        <div
-                          style={{
-                            textAlign: "center",
-                            fontSize: 12,
-                            color: "#6b7280",
-                            fontWeight: 500,
-                          }}
-                        >
-                          الحلقة رقم {previewSession.packageSessionNum} من باقة
-                          الـ {limit} حصص
+                        <div style={{ textAlign: "center", fontSize: 16, color: "#6b7280", fontWeight: 500 }}>
+                          الحلقة رقم {previewSession.packageSessionNum} من باقة الـ {limit} حصص
                         </div>
                       </div>
                     )}
@@ -5966,6 +4728,7 @@ function DashboardContent({ user, onLogout }) {
                     padding: "15px",
                     borderTop: "1px solid #e5e7eb",
                     background: "#f9fafb",
+                    width: "100%"
                   }}
                 >
                   <div style={{ display: "flex", gap: 8, marginBottom: 10 }}>
@@ -5978,7 +4741,7 @@ function DashboardContent({ user, onLogout }) {
                         border: "none",
                         padding: "12px",
                         borderRadius: 10,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: 700,
                         cursor: "pointer",
                         fontFamily: "inherit",
@@ -5995,13 +4758,13 @@ function DashboardContent({ user, onLogout }) {
                         border: "none",
                         padding: "12px",
                         borderRadius: 10,
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: 700,
                         cursor: "pointer",
                         fontFamily: "inherit",
                       }}
                     >
-                      ⬇️ حفظ صورة
+                      ⬇️ حفظ صورة 4K
                     </button>
                   </div>
                   <button
@@ -6013,7 +4776,7 @@ function DashboardContent({ user, onLogout }) {
                       border: "none",
                       padding: "10px",
                       borderRadius: 10,
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: 700,
                       cursor: "pointer",
                       fontFamily: "inherit",
@@ -6031,7 +4794,7 @@ function DashboardContent({ user, onLogout }) {
                       padding: "8px",
                       color: "var(--color-text-secondary)",
                       cursor: "pointer",
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: 500,
                       fontFamily: "inherit",
                     }}
@@ -6044,7 +4807,7 @@ function DashboardContent({ user, onLogout }) {
           );
         })()}
 
-      {/* ══ REWARD MODAL ══ */}
+      {/* ══ REWARD MODAL (FIXED FOR HIGH-RES EXPORT) ══ */}
       {showReward &&
         (() => {
           const isMonth = showReward.type === "month";
@@ -6070,209 +4833,209 @@ function DashboardContent({ user, onLogout }) {
                 ref={rewardModalRef}
                 style={{
                   width: "100%",
-                  maxWidth: 400,
+                  maxWidth: "500px",
                   background: "#fff",
                   borderRadius: 16,
                   overflow: "hidden",
                   boxShadow: "0 10px 25px rgba(0,0,0,0.2)",
                   animation: "popIn .5s cubic-bezier(0.175,0.885,0.32,1.275)",
-                  maxHeight: "min(95dvh, 95vh)",
+                  maxHeight: "95vh",
                   display: "flex",
                   flexDirection: "column",
                 }}
               >
-                <div
-                  ref={certRef}
-                  style={{
-                    padding: "25px 20px",
-                    background: isMonth
-                      ? "linear-gradient(135deg,var(--c-amber-bg),var(--c-amber-light))"
-                      : "linear-gradient(135deg,var(--c-primary-bg),var(--c-primary-light))",
-                    textAlign: "center",
-                    position: "relative",
-                    border: isMonth
-                      ? "8px solid var(--c-yellow)"
-                      : "8px solid var(--c-green)",
-                    boxSizing: "border-box",
-                    overflowY: "auto",
-                    flex: 1,
-                  }}
-                >
+                <div style={{ overflowX: "auto", overflowY: "auto", flex: 1 }}>
                   <div
+                    ref={certRef}
                     style={{
+                      width: "700px", // عرض ثابت للشهادة عشان تطلع ضخمة وممتازة
+                      minHeight: "850px", // طول يدي مساحة للخطوط
+                      margin: "0 auto",
+                      padding: "50px 40px",
+                      background: isMonth
+                        ? "linear-gradient(135deg,var(--c-amber-bg),var(--c-amber-light))"
+                        : "linear-gradient(135deg,var(--c-primary-bg),var(--c-primary-light))",
+                      textAlign: "center",
                       position: "relative",
-                      marginBottom: 15,
-                      animation: "celebrate 0.6s ease-out",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: 72,
-                        lineHeight: 1,
-                        filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.1))",
-                      }}
-                    >
-                      {isBoy ? "👦🏻" : "🧕🏻"}
-                    </div>
-                    <div style={{ fontSize: 20, marginTop: 6 }}>
-                      {isBoy
-                        ? "🎉 صَبِيٌّ مُجْتَهِدٌ 🎉"
-                        : "🎊 فَتَاةٌ صَالِحَةٌ 🎊"}
-                    </div>
-                  </div>
-                  <h2
-                    style={{
-                      margin: "0 0 15px",
-                      fontSize: 30,
-                      fontFamily: "var(--font-quran)",
-                      fontWeight: 700,
-                      color: isMonth
-                        ? "var(--c-amber-dark)"
-                        : "var(--c-primary-dark)",
-                      textShadow: "1px 1px 0 #fff",
-                    }}
-                  >
-                    شهادة شكر وتقدير
-                  </h2>
-                  <p
-                    style={{
-                      fontSize: 15,
-                      color: "var(--color-text-secondary)",
-                      lineHeight: 1.7,
-                      margin: "0 0 12px",
-                    }}
-                  >
-                    نتقدم بخالص الشكر والتقدير {isBoy ? "للصبي" : "للفتاة"}{" "}
-                    {isBoy ? "المتميز" : "المتميزة"}:
-                  </p>
-                  <div
-                    style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: "var(--color-text-primary)",
-                      marginBottom: 12,
-                      background: "#fff",
-                      padding: "10px",
-                      borderRadius: 10,
                       border: isMonth
-                        ? "1px dashed var(--c-yellow)"
-                        : "1px dashed var(--c-green)",
+                        ? "12px solid var(--c-yellow)"
+                        : "12px solid var(--c-green)",
+                      boxSizing: "border-box",
+                      fontFamily: "'Tajawal', sans-serif",
+                      direction: "rtl"
                     }}
                   >
-                    {showReward.name}
-                  </div>
-                  <p
-                    style={{
-                      fontSize: 14,
-                      color: "var(--color-text-secondary)",
-                      lineHeight: 1.7,
-                      margin: "0 0 15px",
-                    }}
-                  >
-                    على {isBoy ? "جهده" : "جهدها"} الرائع في حفظ القرآن الكريم
-                    خلال <strong>{isMonth ? "هذا الشهر" : "هذا الأسبوع"}</strong>.
-                    <br />
-                    <br />
-                    نشكر والديه الكرام على حسن المتابعة، ونسأل الله أن يبارك
-                    فيه.
-                  </p>
-                  {showReward.amount && (
                     <div
                       style={{
-                        margin: "20px 0",
-                        background: "#fff",
-                        border: `2px solid ${
-                          isMonth
-                            ? "var(--c-amber-border)"
-                            : "var(--c-primary-mid)"
-                        }`,
-                        borderRadius: 15,
-                        padding: "15px",
                         position: "relative",
-                        animation: "popIn 0.8s ease",
+                        marginBottom: 20,
                       }}
                     >
                       <div
                         style={{
-                          fontSize: 40,
-                          position: "absolute",
-                          top: "-25px",
-                          right: "-15px",
-                          animation: "bounce 2s infinite",
+                          fontSize: 120, // تكبير الإيموجي للوضوح
+                          lineHeight: 1,
+                          filter: "drop-shadow(0 6px 8px rgba(0,0,0,0.15))",
                         }}
                       >
-                        💰
+                        {isBoy ? "👦🏻" : "🧕🏻"}
                       </div>
-                      <div
-                        style={{
-                          fontSize: 14,
-                          color: "var(--color-text-primary)",
-                          fontWeight: 500,
-                          marginBottom: 8,
-                        }}
-                      >
-                        وتقديراً لتفوقه، حصل على مكافأة مالية:
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 36,
-                          fontWeight: 700,
-                          color: "var(--c-amber-dark)",
-                          background:
-                            "linear-gradient(90deg,var(--c-yellow),var(--c-amber-bg),var(--c-yellow))",
-                          backgroundSize: "200% auto",
-                          animation: "coinShine 3s linear infinite",
-                          display: "inline-block",
-                          padding: "5px 20px",
-                          borderRadius: 30,
-                        }}
-                      >
-                        {showReward.amount}{" "}
-                        <span style={{ fontSize: 18, fontWeight: 500 }}>
-                          ج.م
-                        </span>
-                      </div>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          color: "var(--c-primary)",
-                          fontWeight: 700,
-                          marginTop: 8,
-                        }}
-                      >
-                        مُبَارَكٌ لَكَ هَذَا التَّفَوُّقُ! ✨
+                      <div style={{ fontSize: 28, marginTop: 10, fontWeight: 700 }}>
+                        {isBoy
+                          ? "🎉 صَبِيٌّ مُجْتَهِدٌ 🎉"
+                          : "🎊 فَتَاةٌ صَالِحَةٌ 🎊"}
                       </div>
                     </div>
-                  )}
-                  <div
-                    style={{
-                      borderTop: isMonth
-                        ? "1px solid var(--c-amber-border)"
-                        : "1px solid var(--c-primary-mid)",
-                      paddingTop: 15,
-                      marginTop: 15,
-                    }}
-                  >
-                    <div
+                    <h2
                       style={{
-                        fontFamily: "var(--font-quran)",
-                        fontSize: 18,
+                        margin: "0 0 25px",
+                        fontSize: 50,
+                        fontFamily: "'Amiri', serif",
+                        fontWeight: 700,
                         color: isMonth
                           ? "var(--c-amber-dark)"
                           : "var(--c-primary-dark)",
-                        fontWeight: 700,
+                        textShadow: "2px 2px 0 #fff",
                       }}
                     >
-                      المعلم: {TEACHER}
-                    </div>
+                      شهادة شكر وتقدير
+                    </h2>
+                    <p
+                      style={{
+                        fontSize: 22,
+                        color: "#4b5563",
+                        lineHeight: 1.8,
+                        margin: "0 0 20px",
+                      }}
+                    >
+                      نتقدم بخالص الشكر والتقدير {isBoy ? "للصبي" : "للفتاة"}{" "}
+                      {isBoy ? "المتميز" : "المتميزة"}:
+                    </p>
                     <div
                       style={{
-                        fontSize: 11,
-                        color: "var(--color-text-tertiary)",
-                        marginTop: 5,
+                        fontSize: 36,
+                        fontWeight: 700,
+                        color: "#111827",
+                        marginBottom: 20,
+                        background: "#fff",
+                        padding: "15px",
+                        borderRadius: 15,
+                        border: isMonth
+                          ? "2px dashed var(--c-yellow)"
+                          : "2px dashed var(--c-green)",
                       }}
                     >
-                      {getArDate(new Date().toISOString())}
+                      {showReward.name}
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 20,
+                        color: "#4b5563",
+                        lineHeight: 1.9,
+                        margin: "0 0 25px",
+                      }}
+                    >
+                      على {isBoy ? "جهده" : "جهدها"} الرائع في حفظ القرآن الكريم
+                      خلال <strong>{isMonth ? "هذا الشهر" : "هذا الأسبوع"}</strong>.
+                      <br />
+                      <br />
+                      نشكر والديه الكرام على حسن المتابعة، ونسأل الله أن يبارك
+                      فيه.
+                    </p>
+                    {showReward.amount && (
+                      <div
+                        style={{
+                          margin: "30px 40px",
+                          background: "#fff",
+                          border: `3px solid ${
+                            isMonth
+                              ? "var(--c-amber-border)"
+                              : "var(--c-primary-mid)"
+                          }`,
+                          borderRadius: 20,
+                          padding: "25px",
+                          position: "relative",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: 60,
+                            position: "absolute",
+                            top: "-40px",
+                            right: "-20px",
+                          }}
+                        >
+                          💰
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 20,
+                            color: "#111827",
+                            fontWeight: 700,
+                            marginBottom: 15,
+                          }}
+                        >
+                          وتقديراً لتفوقه، حصل على مكافأة مالية:
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 55,
+                            fontWeight: 700,
+                            color: "var(--c-amber-dark)",
+                            background: "linear-gradient(90deg,var(--c-yellow),var(--c-amber-bg),var(--c-yellow))",
+                            backgroundSize: "200% auto",
+                            display: "inline-block",
+                            padding: "10px 40px",
+                            borderRadius: 40,
+                          }}
+                        >
+                          {showReward.amount}{" "}
+                          <span style={{ fontSize: 26, fontWeight: 700 }}>
+                            ج.م
+                          </span>
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 18,
+                            color: "var(--c-primary)",
+                            fontWeight: 700,
+                            marginTop: 15,
+                          }}
+                        >
+                          مُبَارَكٌ لَكَ هَذَا التَّفَوُّقُ! ✨
+                        </div>
+                      </div>
+                    )}
+                    <div
+                      style={{
+                        borderTop: isMonth
+                          ? "2px solid var(--c-amber-border)"
+                          : "2px solid var(--c-primary-mid)",
+                        paddingTop: 25,
+                        marginTop: 30,
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontFamily: "'Amiri', serif",
+                          fontSize: 26,
+                          color: isMonth
+                            ? "var(--c-amber-dark)"
+                            : "var(--c-primary-dark)",
+                          fontWeight: 700,
+                        }}
+                      >
+                        المعلم: {TEACHER}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 16,
+                          color: "#6b7280",
+                          marginTop: 10,
+                        }}
+                      >
+                        {getArDate(new Date().toISOString())}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -6281,6 +5044,7 @@ function DashboardContent({ user, onLogout }) {
                     padding: "15px",
                     background: "#f9fafb",
                     borderTop: "1px solid #e5e7eb",
+                    width: "100%"
                   }}
                 >
                   <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
@@ -6293,7 +5057,7 @@ function DashboardContent({ user, onLogout }) {
                         border: "none",
                         padding: "12px",
                         borderRadius: 10,
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: 700,
                         cursor: "pointer",
                         fontFamily: "inherit",
@@ -6312,7 +5076,7 @@ function DashboardContent({ user, onLogout }) {
                         border: "none",
                         padding: "12px",
                         borderRadius: 10,
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: 700,
                         cursor: "pointer",
                         fontFamily: "inherit",
@@ -6330,7 +5094,7 @@ function DashboardContent({ user, onLogout }) {
                       padding: "8px",
                       color: "var(--color-text-secondary)",
                       cursor: "pointer",
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: 500,
                       fontFamily: "inherit",
                     }}
