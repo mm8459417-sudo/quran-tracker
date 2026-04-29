@@ -6541,4 +6541,10 @@ function DashboardContent({ user, onLogout }) {
   );
 }
 
-export default Dashboard;
+export default function Dashboard({ user, onLogout }) {
+  return (
+    <ErrorBoundary>
+      <DashboardContent user={user} onLogout={onLogout} />
+    </ErrorBoundary>
+  );
+}
